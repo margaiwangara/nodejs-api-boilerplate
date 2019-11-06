@@ -1,15 +1,24 @@
 const express = require("express");
 const router = express.Router({ mergeParams: true });
 
+// get controller methods
+const {
+  getFoo,
+  getFoos,
+  updateFoo,
+  deleteFoo,
+  createFoo
+} = require("../controllers/foo");
+
 router
   .route("/")
-  .get()
-  .post();
+  .get(getFoos)
+  .post(createFoo);
 
 router
   .route("/:id")
-  .get()
-  .put()
-  .delete();
+  .get(getFoo)
+  .put(updateFoo)
+  .delete(deleteFoo);
 
 module.exports = router;

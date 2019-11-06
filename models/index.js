@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 // set debug to true to display db responses
-mongoose.set(debug, true);
+mongoose.set("debug", true);
 // enable promises for mongoose
 mongoose.Promise = Promise;
 

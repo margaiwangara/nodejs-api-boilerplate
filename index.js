@@ -11,6 +11,10 @@ const app = express();
 // invoke middlewares
 app.use(cors());
 
+// api routes
+const fooRoutes = require("./routes/foo");
+app.use("/api/foo", fooRoutes);
+
 // Error Handler
 app.use(function(req, res, next) {
   let error = new Error("Not Found");
