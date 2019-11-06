@@ -16,4 +16,4 @@ mongoose
   .then(conn => console.log(`MongoDB Connected: ${conn.connection.host}`))
   .catch(error => console.log(error));
 
-module.exports.Test = require("./test");
+module.exports.Foo = require("./foo");

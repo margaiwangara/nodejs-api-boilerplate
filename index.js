@@ -17,7 +17,7 @@ app.use(function(req, res, next) {
   error.status = 404;
   next(error);
 });
-const errorHandler = require("./handlers/errors");
+const errorHandler = require("./handlers/error");
 app.use(errorHandler);
 
 // set PORT and run app
