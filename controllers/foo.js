@@ -33,9 +33,8 @@ exports.createFoo = async (req, res, next) => {
 exports.updateFoo = async (req, res, next) => {
   try {
     const updatedFoo = await db.Foo.findOneAndUpdate(
-      { id: req.params.id },
-      req.body,
-      { upsert: true }
+      { _id: req.params.id },
+      req.body
     );
 
     return res.status(200).json(updatedFoo);

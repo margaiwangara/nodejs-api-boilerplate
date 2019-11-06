@@ -10,7 +10,7 @@ const app = express();
 
 // invoke middlewares
 app.use(cors());
-
+app.use(express.json());
 // api routes
 const fooRoutes = require("./routes/foo");
 app.use("/api/foo", fooRoutes);
