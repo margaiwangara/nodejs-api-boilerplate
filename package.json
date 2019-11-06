@@ -1,0 +1,34 @@
+{
+  "name": "nodejs-api-boilerplate",
+  "version": "1.0.0",
+  "description": "A boilerplate for all my node js api applications",
+  "main": "index.js",
+  "scripts": {
+    "start": "SET NODE_ENV=production & node index",
+    "dev": "nodemon index"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/margaiwangara/nodejs-api-boilerplate.git"
+  },
+  "keywords": [
+    "nodejs",
+    "nodejs api",
+    "nodejs api boilerplate"
+  ],
+  "author": "Margai Wangara",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/margaiwangara/nodejs-api-boilerplate/issues"
+  },
+  "homepage": "https://github.com/margaiwangara/nodejs-api-boilerplate#readme",
+  "devDependencies": {
+    "nodemon": "^1.19.4"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "mongoose": "^5.7.8"
+  }
+}
