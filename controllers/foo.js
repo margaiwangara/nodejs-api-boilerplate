@@ -18,7 +18,7 @@ exports.getFoo = async (req, res, next) => {
     }
     return res.status(200).json(foo);
   } catch (error) {
-    return next(new ErrorHandler(`Foo item ${req.params.id} not found`, 404));
+    return next(error);
   }
 };
 
@@ -48,7 +48,7 @@ exports.deleteFoo = async (req, res, next) => {
   try {
     await db.Foo.findByIdAndDelete(req.params.id);
     return res.status(200).json({
-      message: "Item deleted successfully"
+      success: true
     });
   } catch (error) {
     return next({
