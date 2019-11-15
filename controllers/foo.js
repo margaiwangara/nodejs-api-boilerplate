@@ -1,15 +1,23 @@
 const db = require("../models");
 const ErrorResponse = require("../utils/ErrorResponse");
 
+/**
+ * @desc    GET all data
+ * @route   /api/foo
+ */
 exports.getFoos = async (req, res, next) => {
   try {
     const foos = await db.Foo.find({}).sort({ createdAt: -1 });
     return res.status(200).json(foos);
   } catch (error) {
-    return next(error);
+    next(error);
   }
 };
 
+/**
+ * @desc    GET single data
+ * @route   /api/foo/:id
+ */
 exports.getFoo = async (req, res, next) => {
   try {
     const foo = await db.Foo.findById(req.params.id);
@@ -18,32 +26,48 @@ exports.getFoo = async (req, res, next) => {
     }
     return res.status(200).json(foo);
   } catch (error) {
-    return next(error);
+    next(error);
   }
 };
 
+/**
+ * @desc    CREATE and add documents to collection
+ * @route   /api/foo
+ */
 exports.createFoo = async (req, res, next) => {
   try {
     const newFoo = await db.Foo.create(req.body);
     return res.status(201).json(newFoo);
   } catch (error) {
-    return next(error);
+    next(error);
   }
 };
 
+/**
+ * @desc    UPDATE document in collection
+ * @route   /api/foo/:id
+ */
 exports.updateFoo = async (req, res, next) => {
   try {
     const updatedFoo = await db.Foo.findOneAndUpdate(
       { _id: req.params.id },
-      req.body
+      req.body,
+      {
+        new: true,
+        runValidators: true
+      }
     );
 
     return res.status(200).json(updatedFoo);
   } catch (error) {
-    return next(error);
+    next(error);
   }
 };
 
+/**
+ * @desc    DELETE document from collection
+ * @route   /api/foo/:id
+ */
 exports.deleteFoo = async (req, res, next) => {
   try {
     await db.Foo.findByIdAndDelete(req.params.id);
@@ -51,6 +75,6 @@ exports.deleteFoo = async (req, res, next) => {
       success: true
     });
   } catch (error) {
-    return next(error);
+    next(error);
   }
 };
