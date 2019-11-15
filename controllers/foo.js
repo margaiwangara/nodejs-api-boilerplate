@@ -1,5 +1,5 @@
 const db = require("../models");
-const ErrorHandler = require("../utils/ErrorHandler");
+const ErrorResponse = require("../utils/ErrorResponse");
 
 exports.getFoos = async (req, res, next) => {
   try {
@@ -14,7 +14,7 @@ exports.getFoo = async (req, res, next) => {
   try {
     const foo = await db.Foo.findById(req.params.id);
     if (!foo) {
-      return next(new ErrorHandler(`Foo item ${req.params.id} not found`, 404));
+      return next(new ErrorResponse(`Resource Not Found`, 404));
     }
     return res.status(200).json(foo);
   } catch (error) {
@@ -51,9 +51,6 @@ exports.deleteFoo = async (req, res, next) => {
       success: true
     });
   } catch (error) {
-    return next({
-      status: 500,
-      message: "Oops! Something went wrong"
-    });
+    return next(error);
   }
 };

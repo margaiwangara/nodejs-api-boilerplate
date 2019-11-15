@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
+const colors = require("colors");
 
 // load env vars
 dotenv.config({ path: "./config/config.env" });
@@ -28,5 +29,7 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 5000;
 app.listen(
   PORT,
-  console.log(`App running in ${process.env.NODE_ENV} mode on port ${PORT}`)
+  console.log(
+    `App running in ${process.env.NODE_ENV} mode on port ${PORT}`.green.bold
+  )
 );

@@ -1,8 +1,8 @@
-class ErrorHandler extends Error {
+class ErrorResponse extends Error {
   constructor(message, status) {
     super(message);
     this.status = status;
   }
 }
 
-module.exports = ErrorHandler;
+module.exports = ErrorResponse;
