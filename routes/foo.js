@@ -10,9 +10,12 @@ const {
   createFoo
 } = require("../controllers/foo");
 
+const Foo = require("../models/foo");
+const advancedResults = require("../middleware/advancedResults");
+
 router
   .route("/")
-  .get(getFoos)
+  .get(advancedResults(Foo), getFoos)
   .post(createFoo);
 
 router

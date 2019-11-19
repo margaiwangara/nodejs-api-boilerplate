@@ -7,8 +7,7 @@ const ErrorResponse = require("../utils/ErrorResponse");
  */
 exports.getFoos = async (req, res, next) => {
   try {
-    const foos = await db.Foo.find({}).sort({ createdAt: -1 });
-    return res.status(200).json(foos);
+    return res.status(200).json(res.advancedResults);
   } catch (error) {
     next(error);
   }
