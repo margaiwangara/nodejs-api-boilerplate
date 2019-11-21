@@ -17,3 +17,4 @@ mongoose
   .catch(error => console.log(error));
 
 module.exports.Foo = require("./foo");
+module.exports.User = require("./users");

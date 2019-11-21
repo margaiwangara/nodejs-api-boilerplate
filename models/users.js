@@ -6,11 +6,11 @@ const userSchema = new mongoose.Schema(
     name: {
       type: String,
       required: [true, "Name field is required"],
-      maxlength: 255
+      maxlength: [255, "You have exceeded the maximum name length[255]"]
     },
     surname: {
       type: String,
-      maxlength: 255
+      maxlength: [255, "You have exceeded the maximum surname length[255]"]
     },
     email: {
       type: String,
@@ -20,11 +20,11 @@ const userSchema = new mongoose.Schema(
         /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/,
         "Please enter a valid email"
       ],
-      maxlength: 100
+      maxlength: [100, "You have exceeded the maximum email length[100]"]
     },
     password: {
       type: String,
-      minlength: 6,
+      minlength: [6, "Password length should be at least 6 characters"],
       match: [
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,}$/,
         "Please enter a valid password, at least one lowercase and uppercase letter and one number"
@@ -41,7 +41,10 @@ const userSchema = new mongoose.Schema(
     resetPasswordToken: String,
     passwordTokenExpire: Date,
     confirmEmailToken: String,
-    isEmailConfirmed: Boolean
+    isEmailConfirmed: {
+      type: Boolean,
+      default: false
+    }
   },
   {
     timestamps: true

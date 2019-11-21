@@ -12,9 +12,12 @@ const app = express();
 // invoke middlewares
 app.use(cors());
 app.use(express.json());
+
 // api routes
 const fooRoutes = require("./routes/foo");
+const authRoutes = require("./routes/auth");
 app.use("/api/foo", fooRoutes);
+app.use("/api/auth", authRoutes);
 
 // Error Handler
 app.use(function(req, res, next) {
