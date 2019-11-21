@@ -19,8 +19,11 @@ exports.registerUser = async (req, res, next) => {
       ...req.body
     });
 
+    // get JWT Token
+    const token = user.generateJSONWebToken();
+
     // return
-    return res.status(201).json({ success: true, user });
+    return res.status(201).json({ success: true, token });
   } catch (error) {
     next(error);
   }
