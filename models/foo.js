@@ -8,7 +8,6 @@ const fooSchema = new mongoose.Schema({
   },
   surname: {
     type: String,
-    required: false,
     maxlength: 150
   },
   email: {

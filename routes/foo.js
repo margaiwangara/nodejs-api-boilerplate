@@ -10,18 +10,22 @@ const {
   createFoo
 } = require("../controllers/foo");
 
+// Foo Model
 const Foo = require("../models/foo");
+
+// middleware
 const advancedResults = require("../middleware/advancedResults");
+const { userAuthorized } = require("../middleware/auth");
 
 router
   .route("/")
   .get(advancedResults(Foo), getFoos)
-  .post(createFoo);
+  .post(userAuthorized, createFoo);
 
 router
   .route("/:id")
   .get(getFoo)
-  .put(updateFoo)
-  .delete(deleteFoo);
+  .put(userAuthorized, updateFoo)
+  .delete(userAuthorized, deleteFoo);
 
 module.exports = router;
