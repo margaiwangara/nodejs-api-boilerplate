@@ -63,24 +63,25 @@ exports.loginUser = async (req, res, next) => {
   }
 };
 
-// /**
-//  * @desc    Get Currently Logged In User
-//  * @route   POST /api/auth/account
-//  * @access  Public
-//  */
-// const getCurrentlyLoggedInUser = (req, res, next) => {
-//   try {
-//     // get JWT from headers
-//     let headers, token;
-//     headers = req.headers.authorization;
+/**
+ * @desc    Get Currently Logged In User
+ * @route   POST /api/auth/account
+ * @access  Public
+ */
+exports.getCurrentlyLoggedInUser = async (req, res, next) => {
+  try {
+    // get user from req object
+    const user = await db.User.findById(req.user._id);
 
-//     if(headers && headers.startsWith('Bearer')){
-//       token = headers.token.split(' ')[1];
-//     }
-//   } catch (error) {
-//     next(error);
-//   }
-// }
+    return res.status(200).json({
+      success: true,
+      data: user
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // Store JWT in cookie
 const getTokenResponse = (model, statusCode, res) => {
   // token
