@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const colors = require("colors");
+const cookieParser = require("cookie-parser");
 
 // load env vars
 dotenv.config({ path: "./config/config.env" });
@@ -12,6 +13,7 @@ const app = express();
 // invoke middlewares
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
 
 // api routes
 const fooRoutes = require("./routes/foo");

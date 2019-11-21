@@ -20,10 +20,7 @@ exports.registerUser = async (req, res, next) => {
     });
 
     // get JWT Token
-    const token = user.generateJSONWebToken();
-
-    // return
-    return res.status(201).json({ success: true, token });
+    getTokenResponse(user, 201, res);
   } catch (error) {
     next(error);
   }
@@ -59,8 +56,51 @@ exports.loginUser = async (req, res, next) => {
       return next(new ErrorResponse("Invalid credentials", 401));
     }
 
-    return res.status(200).json({ success: true });
+    // JSONWeb Token
+    getTokenResponse(user, 200, res);
   } catch (error) {
     next(error);
   }
+};
+
+// /**
+//  * @desc    Get Currently Logged In User
+//  * @route   POST /api/auth/account
+//  * @access  Public
+//  */
+// const getCurrentlyLoggedInUser = (req, res, next) => {
+//   try {
+//     // get JWT from headers
+//     let headers, token;
+//     headers = req.headers.authorization;
+
+//     if(headers && headers.startsWith('Bearer')){
+//       token = headers.token.split(' ')[1];
+//     }
+//   } catch (error) {
+//     next(error);
+//   }
+// }
+// Store JWT in cookie
+const getTokenResponse = (model, statusCode, res) => {
+  // token
+  const token = model.generateJSONWebToken();
+
+  // cookie options
+  const options = {
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000
+    ),
+    httpOnly: true
+  };
+
+  // in production cookie is secure
+  if (process.env.NODE_ENV == "production") {
+    options.secure = true;
+  }
+
+  return res
+    .status(statusCode)
+    .cookie("token", token, options)
+    .json({ success: true, token });
 };
