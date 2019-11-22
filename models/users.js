@@ -40,6 +40,11 @@ const userSchema = new mongoose.Schema(
       default: "user",
       required: [true, "Role field is required"]
     },
+    profileImage: {
+      type: String,
+      default: "no-image.jpg",
+      maxlength: [255, "You have exceeded the image name length[255]"]
+    },
     resetPasswordToken: String,
     passwordTokenExpire: Date,
     confirmEmailToken: String,

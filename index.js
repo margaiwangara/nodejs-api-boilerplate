@@ -1,8 +1,10 @@
+const path = require("path");
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const colors = require("colors");
 const cookieParser = require("cookie-parser");
+const fileUpload = require("express-fileupload");
 
 // load env vars
 dotenv.config({ path: "./config/config.env" });
@@ -14,6 +16,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
+app.use(fileUpload());
+
+// static files in public folder
+app.use(express.static(path.join(__dirname, "public")));
 
 // api routes
 const fooRoutes = require("./routes/foo");

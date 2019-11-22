@@ -23,6 +23,7 @@ function errorHandler(error, request, response, next) {
     err = new ErrorResponse(message, 400);
   }
 
+  console.log(err);
   return response.status(err.status || 500).json({
     error: {
       message: err.message || "Oops! Something went wrong"

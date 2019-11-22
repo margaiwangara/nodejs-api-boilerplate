@@ -1,3 +1,4 @@
+const path = require("path");
 const db = require("../models");
 const ErrorResponse = require("../utils/ErrorResponse");
 
@@ -66,7 +67,7 @@ exports.loginUser = async (req, res, next) => {
 /**
  * @desc    Get Currently Logged In User
  * @route   POST /api/auth/account
- * @access  Public
+ * @access  Private
  */
 exports.getCurrentlyLoggedInUser = async (req, res, next) => {
   try {
@@ -76,6 +77,110 @@ exports.getCurrentlyLoggedInUser = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       data: user
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @desc    Edit User Details
+ * @route   PUT /api/auth/account/edit
+ * @access  Private
+ */
+exports.editLoggedInUserDetails = async (req, res, next) => {
+  try {
+    // get fields to be updated
+    const updatedFields = {
+      name: req.body.name || req.user.name,
+      email: req.body.email || req.user.email,
+      surname: req.body.surname || req.user.surname
+    };
+
+    // find user by id
+    const user = await db.User.findById(req.user._id);
+
+    if (user == null) {
+      console.log("user not found");
+      return next(new ErrorResponse("User not found", 404));
+    }
+
+    // update user
+    const updatedUser = await db.User.findByIdAndUpdate(
+      req.user._id,
+      updatedFields,
+      {
+        new: true,
+        runValidators: false
+      }
+    );
+
+    return res.status(200).json({ success: true, updatedUser });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @desc    update User Profile Image
+ * @route   PUT /api/auth/account/edit/profile
+ * @access  Private
+ */
+exports.updateLoggedInUserProfileImage = async (req, res, next) => {
+  try {
+    const user = await db.User.findById(req.user._id);
+
+    // if user exists
+    if (!user) {
+      return next(new ErrorResponse("User not found!", 404));
+    }
+
+    // if file exists
+    console.log(req.files);
+    if (!req.files) {
+      return next(new ErrorResponse("Please upload a file", 400));
+    }
+
+    // get file
+    const file = req.files.file;
+
+    // check if file is an image
+    if (!file.mimetype.startsWith("image")) {
+      return next("Please upload an image file", 400);
+    }
+
+    // check maximum size
+    if (file.size > process.env.FILE_MAX_SIZE) {
+      return next(
+        new ErrorResponse(
+          `Maximum file size exceeded[${Math.floor(
+            process.env.FILE_MAX_SIZE / 1000000
+          )}MB]`,
+          400
+        )
+      );
+    }
+
+    // move file
+    file.name = `profile_${user._id}${path.parse(file.name).ext}`;
+    file.mv(`${process.env.FILE_UPLOAD_PATH}/${file.name}`, async err => {
+      if (err) {
+        return next(new ErrorResponse("File upload failed", 500));
+      }
+
+      try {
+        // Update db
+        await db.User.findByIdAndUpdate(user._id, {
+          profileImage: file.name
+        });
+      } catch (error) {
+        return next(error);
+      }
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: `File ${file.name} upload was successful`
     });
   } catch (error) {
     next(error);

@@ -9,12 +9,20 @@ const { userAuthorized } = require("../middleware/auth");
 const {
   registerUser,
   loginUser,
-  getCurrentlyLoggedInUser
+  getCurrentlyLoggedInUser,
+  editLoggedInUserDetails,
+  updateLoggedInUserProfileImage
 } = require("../controllers/auth");
 
 // routes
 router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.get("/account", userAuthorized, getCurrentlyLoggedInUser);
+router.put("/account/edit", userAuthorized, editLoggedInUserDetails);
+router.put(
+  "/account/edit/profile",
+  userAuthorized,
+  updateLoggedInUserProfileImage
+);
 
 module.exports = router;
