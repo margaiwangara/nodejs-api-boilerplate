@@ -212,7 +212,13 @@ exports.forgotPassword = async (req, res, next) => {
 
     // generate reset token
     const resetToken = user.generatePasswordResetToken();
+
+    // save token in db
+    await user.save({ validateBeforeSave: false });
+
+    return res.status(200).json({ success: true, resetToken });
   } catch (error) {
+    console.log(error);
     next(error);
   }
 };
