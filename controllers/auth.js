@@ -2,6 +2,9 @@ const path = require("path");
 const db = require("../models");
 const ErrorResponse = require("../utils/ErrorResponse");
 
+// send email function
+const sendEmail = require("../utils/sendEmail");
+
 /**
  * @desc    Register New User
  * @route   POST /api/auth/register
@@ -215,6 +218,27 @@ exports.forgotPassword = async (req, res, next) => {
 
     // save token in db
     await user.save({ validateBeforeSave: false });
+
+    // send email to user with token and stuff
+    const URL = `${req.protocol}://${req.get(
+      "host"
+    )}/api/auth/resetpassword?token=${resetToken}`;
+    const options = {
+      from: `${process.env.NOREPLY_NAME}<${process.env.NOREPLY_EMAIL}>`,
+      to: email,
+      subject: "Password Reset Token",
+      html: `<p style='text-align: center;display: block;font-family: Helvetica;line-height: 1.5rem;'>Please click on the link below to reset your password<br/>
+            <a style='text-decoration: none;' href='${URL}'>${URL}</a></p>`
+    };
+
+    // send email
+    const sendResult = await sendEmail(options);
+
+    if (!sendResult) {
+      return next(
+        new ErrorResponse("Email not sent. Please try again later", 500)
+      );
+    }
 
     return res.status(200).json({ success: true, resetToken });
   } catch (error) {
