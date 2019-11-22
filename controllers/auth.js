@@ -187,6 +187,35 @@ exports.updateLoggedInUserProfileImage = async (req, res, next) => {
   }
 };
 
+/**
+ * @desc    Forgot Password
+ * @route   POST /api/auth/forgotpassword
+ * @access  Public
+ */
+exports.forgotPassword = async (req, res, next) => {
+  try {
+    // get email from req
+    const { email } = req.body;
+
+    if (!email) {
+      return next(new ErrorResponse("Please input your email address", 400));
+    }
+
+    // check user with email
+    const user = await db.User.findOne({ email });
+
+    if (!user) {
+      return next(
+        new ErrorResponse(`User with email ${email} has not been found`, 404)
+      );
+    }
+
+    // generate reset token
+    const resetToken = user.generatePasswordResetToken();
+  } catch (error) {
+    next(error);
+  }
+};
 // Store JWT in cookie
 const getTokenResponse = (model, statusCode, res) => {
   // token
