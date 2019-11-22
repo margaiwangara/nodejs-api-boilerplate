@@ -15,12 +15,12 @@ const Foo = require("../models/foo");
 
 // middleware
 const advancedResults = require("../middleware/advancedResults");
-const { userAuthorized } = require("../middleware/auth");
+const { userAuthorized, roleAuthorized } = require("../middleware/auth");
 
 router
   .route("/")
   .get(advancedResults(Foo), getFoos)
-  .post(userAuthorized, createFoo);
+  .post(userAuthorized, roleAuthorized("admin"), createFoo);
 
 router
   .route("/:id")

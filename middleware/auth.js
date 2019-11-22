@@ -27,3 +27,27 @@ exports.userAuthorized = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.roleAuthorized = (...roles) => async (req, res, next) => {
+  try {
+    // get user
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      return next(new ErrorResponse("User not found!", 404));
+    }
+
+    if (!roles.includes(user.role)) {
+      return next(
+        new ErrorResponse(
+          `User role '${user.role}' is not allowed to access this route`,
+          403
+        )
+      );
+    }
+
+    next();
+  } catch (error) {
+    next(error);
+  }
+};
