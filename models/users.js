@@ -106,11 +106,9 @@ userSchema.methods.generatePasswordResetToken = function(next) {
 // Get JSON Web Token
 userSchema.methods.generateJSONWebToken = function(next) {
   try {
-    const token = jwt.sign(
-      { id: this._id, email: this.email },
-      process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRE }
-    );
+    const token = jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
+      expiresIn: process.env.JWT_EXPIRE
+    });
 
     return token;
   } catch (error) {

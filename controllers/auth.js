@@ -2,6 +2,7 @@ const path = require("path");
 const db = require("../models");
 const ErrorResponse = require("../utils/ErrorResponse");
 const crypto = require("crypto");
+const bcrypt = require("bcryptjs");
 
 // send email function
 const sendEmail = require("../utils/sendEmail");
@@ -126,7 +127,7 @@ exports.editLoggedInUserDetails = async (req, res, next) => {
 };
 
 /**
- * @desc    update User Profile Image
+ * @desc    Update User Profile Image
  * @route   PUT /api/auth/account/edit/profile
  * @access  Private
  */
@@ -191,6 +192,73 @@ exports.updateLoggedInUserProfileImage = async (req, res, next) => {
   }
 };
 
+/**
+ * @desc    Update User Password
+ * @route   PUT /api/auth/account/edit/password
+ * @access  Private
+ */
+exports.updatePassword = async (req, res, next) => {
+  try {
+    // password ops
+    const { oldPassword, password, confirmPassword } = req.body;
+    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,}$/;
+
+    // check password input
+    if (!password || !confirmPassword || !oldPassword) {
+      return next(
+        new ErrorResponse(
+          "Password, Confirm Password and Old Password fields are required",
+          400
+        )
+      );
+    }
+
+    // check password validity
+    if (regex.test(password) === false) {
+      return next(
+        new ErrorResponse(
+          "Please enter a valid password, at least one lowercase and uppercase letter and one number",
+          400
+        )
+      );
+    }
+
+    // check confirm password match
+    if (password !== confirmPassword) {
+      return next(
+        new ErrorResponse(
+          "Password and Confirm Password fields must match",
+          400
+        )
+      );
+    }
+
+    // check if password matches with one in db
+    const user = await db.User.findById(req.user._id).select("+password");
+    if (!user) {
+      return next(new ErrorResponse("User not found", 404));
+    }
+
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+
+    // if match
+    if (!isMatch) {
+      return next(new ErrorResponse("Invalid credentials", 401));
+    }
+
+    // change password
+    user.password = password;
+
+    // save
+    await user.save({ validateBeforeSave: false });
+
+    return res
+      .status(200)
+      .json({ success: true, message: "Password updated successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
 /**
  * @desc    Forgot Password
  * @route   POST /api/auth/forgotpassword

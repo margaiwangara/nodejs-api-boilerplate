@@ -13,7 +13,8 @@ const {
   editLoggedInUserDetails,
   updateLoggedInUserProfileImage,
   forgotPassword,
-  resetPassword
+  resetPassword,
+  updatePassword
 } = require("../controllers/auth");
 
 // routes
@@ -22,6 +23,7 @@ router.post("/login", loginUser);
 router.post("/forgotpassword", forgotPassword);
 router.post("/resetpassword", resetPassword);
 router.get("/account", userAuthorized, getCurrentlyLoggedInUser);
+router.put("/account/edit/password", userAuthorized, updatePassword);
 router.put("/account/edit", userAuthorized, editLoggedInUserDetails);
 router.put(
   "/account/edit/profile",
