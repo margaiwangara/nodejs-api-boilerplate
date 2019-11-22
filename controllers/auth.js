@@ -252,9 +252,8 @@ exports.updatePassword = async (req, res, next) => {
     // save
     await user.save({ validateBeforeSave: false });
 
-    return res
-      .status(200)
-      .json({ success: true, message: "Password updated successfully" });
+    // generate JWT
+    getTokenResponse(user, 200, res);
   } catch (error) {
     next(error);
   }

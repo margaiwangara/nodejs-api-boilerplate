@@ -18,3 +18,4 @@ mongoose
 
 module.exports.Foo = require("./foo");
 module.exports.User = require("./users");
+module.exports.Post = require("./posts");
