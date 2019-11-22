@@ -1,6 +1,7 @@
 const path = require("path");
 const db = require("../models");
 const ErrorResponse = require("../utils/ErrorResponse");
+const crypto = require("crypto");
 
 // send email function
 const sendEmail = require("../utils/sendEmail");
@@ -240,12 +241,76 @@ exports.forgotPassword = async (req, res, next) => {
       );
     }
 
-    return res.status(200).json({ success: true, resetToken });
+    return res.status(200).json({
+      success: true,
+      message: "Please check your email to reset your password"
+    });
   } catch (error) {
     console.log(error);
     next(error);
   }
 };
+
+/**
+ * @desc    Reset Password
+ * @route   POST /api/auth/resetpassword
+ * @access  Private
+ */
+exports.resetPassword = async (req, res, next) => {
+  try {
+    // check if token is passed
+    const { token } = req.query;
+
+    if (!token) {
+      return next(new ErrorResponse("Invalid Token", 400));
+    }
+
+    const resetPasswordToken = crypto
+      .createHash("sha256")
+      .update(token)
+      .digest("hex");
+
+    // get user by token
+    const user = await db.User.findOne({
+      resetPasswordToken,
+      passwordTokenExpire: { $gt: Date.now() }
+    });
+
+    if (!user) {
+      return next(new ErrorResponse("Invalid Token", 400));
+    }
+
+    // set new password
+    const { password } = req.body;
+    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,}$/;
+    if (!password) {
+      return next(new ErrorResponse("Password field is required", 400));
+    }
+
+    if (regex.test(password) === false) {
+      return next(
+        new ErrorResponse(
+          "Please enter a valid password, at least one lowercase and uppercase letter and one number",
+          400
+        )
+      );
+    }
+
+    user.password = password;
+    user.resetPasswordToken = undefined;
+    user.passwordTokenExpire = undefined;
+
+    // save changes
+    user.save({ validateBeforeSave: false });
+
+    // generate JWT Token
+    getTokenResponse(user, 200, res);
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
+
 // Store JWT in cookie
 const getTokenResponse = (model, statusCode, res) => {
   // token

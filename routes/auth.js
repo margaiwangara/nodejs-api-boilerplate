@@ -12,13 +12,15 @@ const {
   getCurrentlyLoggedInUser,
   editLoggedInUserDetails,
   updateLoggedInUserProfileImage,
-  forgotPassword
+  forgotPassword,
+  resetPassword
 } = require("../controllers/auth");
 
 // routes
 router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.post("/forgotpassword", forgotPassword);
+router.post("/resetpassword", resetPassword);
 router.get("/account", userAuthorized, getCurrentlyLoggedInUser);
 router.put("/account/edit", userAuthorized, editLoggedInUserDetails);
 router.put(
