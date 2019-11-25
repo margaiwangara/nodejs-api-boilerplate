@@ -56,6 +56,19 @@ const userSchema = new mongoose.Schema(
   },
   {
     timestamps: true
+  },
+  {
+    toJSON: {
+      virtuals: true,
+      versionKey: false,
+      transform: (doc, ret) => {
+        ret.id = ret._id;
+        delete ret._id;
+      }
+    },
+    toObject: {
+      virtuals: true
+    }
   }
 );
 
@@ -75,6 +88,14 @@ userSchema.pre("save", async function(next) {
   } catch (error) {
     next(error);
   }
+});
+
+// virtuals for populate
+userSchema.virtual("posts", {
+  ref: "Users",
+  localField: "_id",
+  foreignField: "user",
+  justOne: false
 });
 
 // Confirm Password Match
