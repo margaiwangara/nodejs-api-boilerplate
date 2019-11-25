@@ -109,7 +109,7 @@ exports.updatePost = async (req, res, next) => {
     }
 
     // check if user id and post user id match
-    if (post.user !== user._id) {
+    if (post.user.toString() !== user._id.toString() || user.role !== "admin") {
       console.log(`Post User: ${post.user}, User Id: ${user._id}`);
 
       return next(
@@ -117,9 +117,10 @@ exports.updatePost = async (req, res, next) => {
       );
     }
 
-    const updatePost = await post.update(req.body, {
+    // update post
+    const updatePost = await db.Post.findByIdAndUpdate(id, req.body, {
       new: true,
-      runValidators: true
+      runValidators: false
     });
 
     return res.status(200).json(updatePost);
@@ -142,7 +143,31 @@ exports.deletePost = async (req, res, next) => {
       return next(new ErrorResponse("Invalid data input", 400));
     }
 
-    await db.Post.findByIdAndDelete(id);
+    // check if user has ownership of post
+    const user = await db.User.findById(req.user._id);
+
+    // find post
+    const post = await db.Post.findById(id);
+
+    // 404 Post not found
+    if (!post) {
+      return next(new ErrorResponse("Resource not found", 404));
+    }
+
+    // 404 User not found
+    if (!user) {
+      return next(new ErrorResponse("User not found", 404));
+    }
+
+    // check if user id and post user id match and role=admin
+    if (post.user.toString() !== user._id.toString() || user.role !== "admin") {
+      return next(
+        new ErrorResponse("You are not authorized to delete this post", 403)
+      );
+    }
+
+    // delete
+    post.remove();
 
     return res.status(200).json({ success: true });
   } catch (error) {
