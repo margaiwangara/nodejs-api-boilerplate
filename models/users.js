@@ -92,7 +92,7 @@ userSchema.pre("save", async function(next) {
 
 // virtuals for populate
 userSchema.virtual("posts", {
-  ref: "Users",
+  ref: "Posts",
   localField: "_id",
   foreignField: "user",
   justOne: false

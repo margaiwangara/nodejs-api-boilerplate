@@ -25,9 +25,11 @@ app.use(express.static(path.join(__dirname, "public")));
 const fooRoutes = require("./routes/foo");
 const postRoutes = require("./routes/posts");
 const authRoutes = require("./routes/auth");
+const userRoutes = require("./routes/users");
 app.use("/api/foo", fooRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/posts", postRoutes);
+app.use("/api/auth/users", userRoutes);
 
 // Error Handler
 app.use(function(req, res, next) {
