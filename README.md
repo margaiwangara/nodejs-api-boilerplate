@@ -5,6 +5,30 @@ based on the functions they performs. The file and folder structure is as follow
 
 #### Updates
 
+##### 25th November 2019
+
+Added a number of functionalities within the past few days
+
+- Authentication
+  - Password Hashing
+  - Password Reset Token
+- Authorization
+  - Roles - admin, user
+- Middleware
+  - userAuthorized - checks if user is logged in before providing access
+  - roleAuthorized - checks the roles passed in as parameters compared to user role in database
+- Model
+  - User
+  - Post
+- Associations
+  - Linked posts and users
+  - Used virtuals and reference keys to populate related data
+- Email Sending
+  - Email Confirmation
+  - Password Reset
+- Image Upload
+  - Users can upload a profile image
+
 ##### 20th November 2019
 
 Added middleware to enable **sorting**, **selection**, **pagination** and **filtering**.
@@ -57,22 +81,36 @@ Added a seeder.js file for easy and efficient database population. Just run the 
 
 #### Folder and File Structure
 
+- data
+  - foo.json
 - config
   - config.env
 - controllers
+  - auth.js
   - foo.js
+  - posts.js
+  - users.js
 - handlers
   - error.js
 - middlewares
   - advancedResult.js
+  - auth.js
 - models
+  - foo.js
   - index.js
-  - foo.js
+  - posts.js
+  - users.js
+- public
+  - uploads
 - routes
+  - auth.js
   - foo.js
-- utils **new**
+  - posts.js
+  - users.js
+- utils
   - ErrorResponse.js
   - seeder.js
+  - sendEmail.js
 - index.js
 
 It is pretty self explanatory
