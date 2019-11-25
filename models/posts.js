@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const slugify = require("slugify");
 
 const postSchema = new mongoose.Schema(
   {
@@ -12,6 +13,7 @@ const postSchema = new mongoose.Schema(
       type: String,
       required: [true, "Body field is required"]
     },
+    slug: String,
     user: {
       type: mongoose.Types.ObjectId,
       ref: "Users",
@@ -22,6 +24,19 @@ const postSchema = new mongoose.Schema(
     timestamps: true
   }
 );
+
+// Pre Save Middleware
+postSchema.pre("save", async function(next) {
+  try {
+    let title = this.title;
+    title = title.replace(/[;\/:*?""<>|&.,']/g, "");
+
+    this.slug = slugify(title, { lower: true });
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
 
 const Post = mongoose.model("Posts", postSchema);
 
