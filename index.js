@@ -23,9 +23,11 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // api routes
 const fooRoutes = require("./routes/foo");
+const postRoutes = require("./routes/posts");
 const authRoutes = require("./routes/auth");
 app.use("/api/foo", fooRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/posts", postRoutes);
 
 // Error Handler
 app.use(function(req, res, next) {
@@ -37,7 +39,7 @@ const errorHandler = require("./handlers/error");
 app.use(errorHandler);
 
 // set PORT and run app
-const PORT = process.env.PORT || 5002;
+const PORT = process.env.PORT || 5001;
 app.listen(
   PORT,
   console.log(
