@@ -103,6 +103,18 @@ userSchema.methods.generatePasswordResetToken = function(next) {
   return resetToken;
 };
 
+// Generate email confirm token
+userSchema.methods.generateEmailConfirmToken = function(next) {
+  // email confirmation token
+  const confirmationToken = crypto.randomBytes(20).toString("hex");
+
+  this.confirmEmailToken = crypto
+    .createHash("sha256")
+    .update(confirmationToken)
+    .digest("hex");
+
+  return confirmationToken;
+};
 // Get JSON Web Token
 userSchema.methods.generateJSONWebToken = function(next) {
   try {

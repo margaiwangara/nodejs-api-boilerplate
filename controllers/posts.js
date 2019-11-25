@@ -40,7 +40,7 @@ exports.getPost = async (req, res, next) => {
     }
 
     // get post
-    const post = await db.Post.findById(id);
+    const post = await db.Post.findById(id).populate("user");
 
     // check if post exists
     if (!post) {
@@ -92,9 +92,34 @@ exports.updatePost = async (req, res, next) => {
       return next(new ErrorResponse("Invalid data input", 400));
     }
 
-    const updatePost = await db.Post.findByIdAndUpdate(id, req.body, {
+    // check if user has ownership of post
+    const user = await db.User.findById(req.user._id);
+
+    // find post
+    const post = await db.Post.findById(id);
+
+    // 404 Post not found
+    if (!post) {
+      return next(new ErrorResponse("Resource not found", 404));
+    }
+
+    // 404 User not found
+    if (!user) {
+      return next(new ErrorResponse("User not found", 404));
+    }
+
+    // check if user id and post user id match
+    if (post.user !== user._id) {
+      console.log(`Post User: ${post.user}, User Id: ${user._id}`);
+
+      return next(
+        new ErrorResponse("You are not authorized to edit this post", 403)
+      );
+    }
+
+    const updatePost = await post.update(req.body, {
       new: true,
-      runValidators: false
+      runValidators: true
     });
 
     return res.status(200).json(updatePost);

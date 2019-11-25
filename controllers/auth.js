@@ -25,6 +25,31 @@ exports.registerUser = async (req, res, next) => {
       ...req.body
     });
 
+    // grab token and send to email
+    const confirmEmailToken = user.generateEmailConfirmToken();
+
+    // save token
+    user.save({ validateBeforeSave: false });
+
+    // send email to user with token and stuff
+    const URL = `${req.protocol}://${req.get(
+      "host"
+    )}/api/auth/confirmemail?token=${confirmEmailToken}`;
+    const options = {
+      from: `${process.env.NOREPLY_NAME}<${process.env.NOREPLY_EMAIL}>`,
+      to: user.email,
+      subject: "Email Confirmation",
+      html: `<p style='text-align: center;display: block;font-family: Helvetica;line-height: 1.5rem;'>Please click on the link below to confirm your email<br/>
+            <a style='text-decoration: none;' href='${URL}'>${URL}</a></p>`
+    };
+
+    // send email
+    const sendResult = await sendEmail(options);
+
+    if (!sendResult) {
+      console.log("Confirmation email not sent");
+    }
+
     // get JWT Token
     getTokenResponse(user, 201, res);
   } catch (error) {
@@ -374,6 +399,49 @@ exports.resetPassword = async (req, res, next) => {
     getTokenResponse(user, 200, res);
   } catch (error) {
     console.log(error);
+    next(error);
+  }
+};
+
+/**
+ * @desc    Confirm Email
+ * @route   GET /api/auth/confirmemail
+ * @access  Private
+ */
+exports.confirmEmail = async (req, res, next) => {
+  try {
+    // grab token from email
+    const { token } = req.query;
+
+    if (!token) {
+      return next(new ErrorResponse("Invalid Token", 400));
+    }
+
+    const confirmEmailToken = crypto
+      .createHash("sha256")
+      .update(token)
+      .digest("hex");
+
+    // get user by token
+    const user = await db.User.findOne({
+      confirmEmailToken
+    });
+
+    if (!user) {
+      return next(new ErrorResponse("Invalid Token", 400));
+    }
+
+    // update confirmed to true
+    user.confirmEmailToken = undefined;
+    user.isEmailConfirmed = true;
+
+    // save
+    user.save({ validateBeforeSave: false });
+
+    console.log(user);
+    // return token
+    getTokenResponse(user, 200, res);
+  } catch (error) {
     next(error);
   }
 };
