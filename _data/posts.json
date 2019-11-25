@@ -1,0 +1,32 @@
+[
+  {
+    "title": "Post 1",
+    "content": "Content For Post 1",
+    "user": "5ddb97a04600b10b8cf00816"
+  },
+  {
+    "title": "Post 2",
+    "content": "Content For Post 2",
+    "user": "5ddb8e5dcc2f554344d7044f"
+  },
+  {
+    "title": "Post 3",
+    "content": "Content For Post 3",
+    "user": "5ddb8d56b606ed4b3840b5f1"
+  },
+  {
+    "title": "Post 4",
+    "content": "Content For Post 4",
+    "user": "5dd80632ebd9ef3a14390bfa"
+  },
+  {
+    "title": "Post 5",
+    "content": "Content For Post 5",
+    "user": "5dd7e689d2badb2500ce7d47"
+  },
+  {
+    "title": "Post 6",
+    "content": "Content For Post 6",
+    "user": "5dd7d9820fb41a1224fe2648"
+  }
+]

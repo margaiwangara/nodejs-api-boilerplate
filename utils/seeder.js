@@ -5,7 +5,7 @@ const colors = require("colors/safe");
 
 // config for colors
 const failure = colors.red.bold;
-const success = colors.green.bold;
+const success = colors.green.inverse;
 
 // configure dotenv
 dotenv.config({ path: `${__dirname}/../config/config.env` });
@@ -23,17 +23,21 @@ mongoose
   .catch(error => console.log(error));
 
 // Initialize DB
-const Foo = require("../models/foo");
+const db = require("../models");
 // Function to acquire data and add to db
-const seedFooCollection = async () => {
+const seedCollections = async () => {
   try {
-    let data = fs.readFileSync(`${__dirname}/../_data/foo.json`);
+    let fooData = fs.readFileSync(`${__dirname}/../_data/foo.json`, "utf-8"),
+      userData = fs.readFileSync(`${__dirname}/../_data/users.json`, "utf-8"),
+      postData = fs.readFileSync(`${__dirname}/../_data/posts.json`, "utf-8");
 
     // save data
-    await Foo.create(JSON.parse(data));
+    await db.User.create(JSON.parse(userData));
+    await db.Foo.create(JSON.parse(fooData));
+    await db.Post.create(JSON.parse(postData));
 
     // successfull response
-    console.log(success("Foo collection seeded successfully"));
+    console.log(success("Collections seeded successfully"));
     // exit process
     process.exit();
   } catch (error) {
@@ -41,11 +45,13 @@ const seedFooCollection = async () => {
   }
 };
 
-const emptyFooCollection = async () => {
+const emptyCollections = async () => {
   try {
-    await Foo.deleteMany();
+    await db.User.deleteMany();
+    await db.Foo.deleteMany();
+    await db.Post.deleteMany();
 
-    console.log(success("Foo collection emptied successfully"));
+    console.log(success("Collections emptied successfully"));
     // exit process
     process.exit();
   } catch (error) {
@@ -54,7 +60,7 @@ const emptyFooCollection = async () => {
 };
 // check if seeding tag is added '-c for creation and -d for deletion'
 if (process.argv[2] === "-c") {
-  seedFooCollection();
+  seedCollections();
 } else if (process.argv[2] === "-d") {
-  emptyFooCollection();
+  emptyCollections();
 }

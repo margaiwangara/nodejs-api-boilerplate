@@ -83,6 +83,8 @@ Added a seeder.js file for easy and efficient database population. Just run the 
 
 - data
   - foo.json
+  - posts.json
+  - users.json
 - config
   - config.env
 - controllers

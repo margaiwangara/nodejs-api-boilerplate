@@ -8,9 +8,6 @@ const ErrorResponse = require("../utils/ErrorResponse");
  */
 exports.getUsers = async (req, res, next) => {
   try {
-    // users
-    const users = await db.User.find();
-
     return res.status(200).json(res.advancedResults);
   } catch (error) {
     next(error);

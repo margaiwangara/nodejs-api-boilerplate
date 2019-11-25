@@ -1,0 +1,82 @@
+[
+  {
+    "__v": 0,
+    "_id": "5ddb97a04600b10b8cf00816",
+    "createdAt": "2019-11-25T08:58:08.217Z",
+    "email": "aceventura@petdetective.com",
+    "isEmailConfirmed": true,
+    "name": "ace",
+    "profileImage": "no-image.jpg",
+    "role": "admin",
+    "surname": "venture",
+    "updatedAt": "2019-11-25T08:59:07.319Z",
+    "password": "AceVentura1"
+  },
+  {
+    "__v": 0,
+    "_id": "5ddb8e5dcc2f554344d7044f",
+    "confirmEmailToken": "1e29b80b97e0330811629bd79731ccb57fafd4869f27a0b2223fdde068db6aa3",
+    "createdAt": "2019-11-25T08:18:37.072Z",
+    "email": "buzzlightyear@toystory.com",
+    "isEmailConfirmed": false,
+    "name": "buzz",
+    "profileImage": "no-image.jpg",
+    "role": "user",
+    "surname": "lightyear",
+    "updatedAt": "2019-11-25T08:18:37.072Z",
+    "password": "BuzzLightYear1"
+  },
+  {
+    "__v": 0,
+    "_id": "5ddb8d56b606ed4b3840b5f1",
+    "confirmEmailToken": "6e0b2a36c3f07b505788fad5dfe2e1ae2c02ce9557893e961e8b6bc3d06c5c8b",
+    "createdAt": "2019-11-25T08:14:14.793Z",
+    "email": "woodyallen@toystory.com",
+    "isEmailConfirmed": false,
+    "name": "woody",
+    "profileImage": "no-image.jpg",
+    "role": "user",
+    "surname": "allen",
+    "updatedAt": "2019-11-25T08:14:14.793Z",
+    "password": "WoodyAllen1"
+  },
+  {
+    "__v": 0,
+    "_id": "5dd80632ebd9ef3a14390bfa",
+    "createdAt": "2019-11-22T16:00:50.594Z",
+    "email": "janedoe@app.com",
+    "isEmailConfirmed": false,
+    "name": "Jane",
+    "profileImage": "no-image.jpg",
+    "role": "user",
+    "surname": "Doe",
+    "updatedAt": "2019-11-22T16:03:02.740Z",
+    "password": "JaneDoe1"
+  },
+  {
+    "__v": 0,
+    "_id": "5dd7e689d2badb2500ce7d47",
+    "createdAt": "2019-11-22T13:45:45.509Z",
+    "email": "jacobmilabi@app.com",
+    "isEmailConfirmed": false,
+    "name": "Jacob",
+    "profileImage": "no-image.jpg",
+    "role": "user",
+    "surname": "Milabi",
+    "updatedAt": "2019-11-22T13:45:45.509Z",
+    "password": "JacobMilabi1"
+  },
+  {
+    "__v": 0,
+    "_id": "5dd7d9820fb41a1224fe2648",
+    "createdAt": "2019-11-22T12:50:10.762Z",
+    "email": "johndoe@app.com",
+    "isEmailConfirmed": false,
+    "name": "John",
+    "profileImage": "profile_5dd7d9820fb41a1224fe2648.jpg",
+    "role": "user",
+    "surname": "Doe",
+    "updatedAt": "2019-11-22T15:35:58.271Z",
+    "password": "JohnDoe1"
+  }
+]
