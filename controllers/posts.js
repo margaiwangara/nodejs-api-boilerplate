@@ -109,8 +109,8 @@ exports.updatePost = async (req, res, next) => {
     }
 
     // check if user id and post user id match
-    if (post.user.toString() !== user._id.toString() || user.role !== "admin") {
-      console.log(`Post User: ${post.user}, User Id: ${user._id}`);
+    if (post.user.toString() !== user._id.toString() && user.role !== "admin") {
+      console.log(`Role: ${user.role}`);
 
       return next(
         new ErrorResponse("You are not authorized to edit this post", 403)
@@ -160,7 +160,7 @@ exports.deletePost = async (req, res, next) => {
     }
 
     // check if user id and post user id match and role=admin
-    if (post.user.toString() !== user._id.toString() || user.role !== "admin") {
+    if (post.user.toString() !== user._id.toString() && user.role !== "admin") {
       return next(
         new ErrorResponse("You are not authorized to delete this post", 403)
       );
