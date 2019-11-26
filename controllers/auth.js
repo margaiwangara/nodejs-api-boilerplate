@@ -102,7 +102,7 @@ exports.loginUser = async (req, res, next) => {
 exports.logoutUser = async (req, res, next) => {
   try {
     // expire cookie after 10 seconds
-    return req
+    return res
       .cookie("token", "none", {
         expires: new Date(Date.now() + 10 * 1000), //expire in 10 seconds
         httpOnly: true
@@ -444,7 +444,8 @@ exports.confirmEmail = async (req, res, next) => {
 
     // get user by token
     const user = await db.User.findOne({
-      confirmEmailToken
+      confirmEmailToken,
+	  isEmailConfirmed: false
     });
 
     if (!user) {
