@@ -6,6 +6,9 @@ const colors = require("colors");
 const cookieParser = require("cookie-parser");
 const fileUpload = require("express-fileupload");
 
+// Security Packages
+const mongoSanitize = require("express-mongo-sanitize");
+
 // load env vars
 dotenv.config({ path: "./config/config.env" });
 
@@ -17,6 +20,9 @@ app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 app.use(fileUpload());
+
+// security middleware
+app.use(mongoSanitize());
 
 // static files in public folder
 app.use(express.static(path.join(__dirname, "public")));
