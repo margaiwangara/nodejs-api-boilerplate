@@ -5,6 +5,15 @@ based on the functions they performs. The file and folder structure is as follow
 
 #### Updates
 
+##### 26th November 2019
+
+Added security fixes
+- NoSQL Injection
+- HPP
+- XSS
+
+Provided global access by using the CORS package
+
 ##### 25th November 2019
 
 Added a number of functionalities within the past few days
