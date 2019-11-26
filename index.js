@@ -8,6 +8,8 @@ const fileUpload = require("express-fileupload");
 
 // Security Packages
 const mongoSanitize = require("express-mongo-sanitize");
+const helmet = require("helmet");
+const xssClean = require("xss-clean");
 
 // load env vars
 dotenv.config({ path: "./config/config.env" });
@@ -22,7 +24,9 @@ app.use(cookieParser());
 app.use(fileUpload());
 
 // security middleware
-app.use(mongoSanitize());
+app.use(mongoSanitize()); //sanitize input to prevent NoSQL Injection
+app.use(helmet()); //helmet to add headers and prevent security flaws
+app.use(xssClean()); //prevent xss attacks eg <script></script> tags in db
 
 // static files in public folder
 app.use(express.static(path.join(__dirname, "public")));
