@@ -10,6 +10,8 @@ const fileUpload = require("express-fileupload");
 const mongoSanitize = require("express-mongo-sanitize");
 const helmet = require("helmet");
 const xssClean = require("xss-clean");
+const rateLimit = require("express-rate-limit");
+const hpp = require("hpp");
 
 // load env vars
 dotenv.config({ path: "./config/config.env" });
@@ -24,9 +26,17 @@ app.use(cookieParser());
 app.use(fileUpload());
 
 // security middleware
+// rate limit
+const limiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 100
+});
+
 app.use(mongoSanitize()); //sanitize input to prevent NoSQL Injection
 app.use(helmet()); //helmet to add headers and prevent security flaws
 app.use(xssClean()); //prevent xss attacks eg <script></script> tags in db
+app.use(limiter); //no of request rate limited
+app.use(hpp()); //prevent http param polution
 
 // static files in public folder
 app.use(express.static(path.join(__dirname, "public")));
