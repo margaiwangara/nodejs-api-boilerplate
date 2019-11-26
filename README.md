@@ -3,6 +3,8 @@
 This is a boilerplate for creating REST APIs in Nodejs. The files are arranged
 based on the functions they performs. The file and folder structure is as follows
 
+Full Documentation [https://nodejsapiboilerplate.herokuapp.com](https://nodejsapiboilerplate.herokuapp.com)
+
 #### Updates
 
 ##### 26th November 2019
