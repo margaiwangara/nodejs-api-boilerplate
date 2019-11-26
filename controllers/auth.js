@@ -95,6 +95,26 @@ exports.loginUser = async (req, res, next) => {
 };
 
 /**
+ * @desc    Logout User/ Clear Cookie
+ * @route   GET /api/auth/logout
+ * @access  Private
+ */
+exports.logoutUser = async (req, res, next) => {
+  try {
+    // expire cookie after 10 seconds
+    return req
+      .cookie("token", "none", {
+        expires: new Date(Date.now() + 10 * 1000), //expire in 10 seconds
+        httpOnly: true
+      })
+      .status(200)
+      .json({ success: true, message: "User logged out successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
  * @desc    Get Currently Logged In User
  * @route   POST /api/auth/account
  * @access  Private

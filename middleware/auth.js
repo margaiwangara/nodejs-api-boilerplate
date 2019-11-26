@@ -10,8 +10,8 @@ exports.userAuthorized = async (req, res, next) => {
 
     // check if token exists and starts with bearer
     if (headers && headers.startsWith("Bearer")) token = headers.split(" ")[1];
-    // else if cookie has token stored
-    // else if (req.cookie.token) token = req.cookie.token;
+    // else if cookie has token stored set token to cookie token
+    else if (req.cookie.token) token = req.cookie.token;
 
     // check token
     if (!token) return next(new ErrorResponse("Unauthorized Access", 401));

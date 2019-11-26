@@ -15,12 +15,14 @@ const {
   forgotPassword,
   resetPassword,
   updatePassword,
-  confirmEmail
+  confirmEmail,
+  logoutUser
 } = require("../controllers/auth");
 
 // routes
 router.post("/register", registerUser);
 router.post("/login", loginUser);
+router.get("/logout", logoutUser);
 router.post("/forgotpassword", forgotPassword);
 router.post("/resetpassword", resetPassword);
 router.get("/confirmemail", confirmEmail);
