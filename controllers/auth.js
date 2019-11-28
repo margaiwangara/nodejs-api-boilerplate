@@ -17,6 +17,10 @@ exports.registerUser = async (req, res, next) => {
     // get user required field
     const { name, email, password } = req.body;
 
+    if (req.body.role === "admin") {
+      req.body.role = undefined;
+    }
+
     // create new user
     const user = await db.User.create({
       name,
@@ -445,7 +449,7 @@ exports.confirmEmail = async (req, res, next) => {
     // get user by token
     const user = await db.User.findOne({
       confirmEmailToken,
-	  isEmailConfirmed: false
+      isEmailConfirmed: false
     });
 
     if (!user) {
