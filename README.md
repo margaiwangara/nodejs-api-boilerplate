@@ -9,7 +9,43 @@ Full Documentation [https://nodejsapiboilerplate.herokuapp.com](https://nodejsap
 
 ##### 26th November 2019
 
+Added github versioning through the terminal
+**Important:** Create a `secret.env` file inside the config folder and add config variables as follows:
+
+```env
+
+GITHUB_TOKEN=xxxx <!-- Secret token to be used by github -->
+GITHUB_USERNAME=xxxx <!-- Github username of repo you want to add a release to -->
+GITHUB_REPO_NAME=xxxx <!-- The name of the github repository -->
+
+```
+
+The env variables above are **required** and in the absence of them the commands will not work. They are used as follows
+
+```javascript
+const URL = `https://api.github.com/repos/${process.env.GITHUB_USERNAME}/${process.env.GITHUB_REPO_NAME}/releases?access_token=${process.env.GITHUB_TOKEN}`;
+```
+
+After adding the environment variables, open terminal and type `node utils/versioner.js releases -t v1.0.0 -b master -n v1.0.0 -c 'Release of version 1.0.0' -d false -p false` to create a release with name of `v1.0.0`
+
+```javascript
+/**
+ * Explanation for the tags added to the command
+ * -t - tag of the release - Required
+ * -n - name of the release
+ * -b - branch to add the release to, type -h to view description in command prompt
+ * -c - body description of the release
+ * -d - means draft, publish the release as draft or not, false | true, default is false
+ * -p - prerelease, publish it as a prerelease, default is false
+ */
+```
+
+To view description of each --tag type the command `node utils/versioner.js releases -h`
+
+##### 26th November 2019
+
 Added security fixes
+
 - NoSQL Injection
 - HPP
 - XSS
