@@ -1,4 +1,10 @@
-node_modules/
+# log files
 *.log
+
+# node modules
+node_modules/
+
+# config
 config/config.env
 config/secret.env
+.vscode/
