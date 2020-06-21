@@ -1,7 +1,7 @@
 {
-  "name": "nodejs-api-boilerplate",
+  "name": "redmonkey-server",
   "version": "1.0.0",
-  "description": "A boilerplate for all my node js api applications",
+  "description": "An educational platform project",
   "main": "index.js",
   "scripts": {
     "start": "SET NODE_ENV=production & node index",
@@ -10,19 +10,19 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/margaiwangara/nodejs-api-boilerplate.git"
+    "url": "git+https://github.com/red-monkey/redmonkey-server.git"
   },
   "keywords": [
-    "nodejs",
-    "nodejs api",
-    "nodejs api boilerplate"
+    "redmonkey",
+    "redmonkey platform",
+    "redmonkey edu"
   ],
   "author": "Margai Wangara",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/margaiwangara/nodejs-api-boilerplate/issues"
+    "url": "https://github.com/red-monkey/redmonkey-server/issues"
   },
-  "homepage": "https://github.com/margaiwangara/nodejs-api-boilerplate#readme",
+  "homepage": "https://github.com/red-monkey/redmonkey-server#readme",
   "devDependencies": {
     "chai": "^4.2.0",
     "chai-http": "^4.3.0",
