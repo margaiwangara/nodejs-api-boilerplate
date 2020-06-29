@@ -1,58 +1,61 @@
-const mongoose = require("mongoose");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const crypto = require("crypto");
+const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
+const randomize = require('randomatic');
 
 // schema
 const userSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, "Name field is required"],
-      maxlength: [255, "You have exceeded the maximum name length[255]"]
+      required: [true, 'Name field is required'],
+      maxlength: [255, 'You have exceeded the maximum name length[255]'],
     },
     surname: {
       type: String,
-      maxlength: [255, "You have exceeded the maximum surname length[255]"]
+      maxlength: [255, 'You have exceeded the maximum surname length[255]'],
     },
     email: {
       type: String,
       unique: true,
-      required: [true, "Email field is required"],
+      required: [true, 'Email field is required'],
       match: [
         /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/,
-        "Please enter a valid email"
+        'Please enter a valid email',
       ],
-      maxlength: [100, "You have exceeded the maximum email length[100]"]
+      maxlength: [100, 'You have exceeded the maximum email length[100]'],
     },
     password: {
       type: String,
-      minlength: [6, "Password length should be at least 6 characters"],
+      minlength: [6, 'Password length should be at least 6 characters'],
       match: [
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,}$/,
-        "Please enter a valid password, at least one lowercase and uppercase letter and one number"
+        'Please enter a valid password, at least one lowercase and uppercase letter and one number',
       ],
       select: false,
-      required: [true, "Password field is required"]
+      required: [true, 'Password field is required'],
     },
     role: {
       type: String,
-      enum: ["user", "admin"],
-      default: "user",
-      required: [true, "Role field is required"]
+      enum: ['user', 'admin'],
+      default: 'user',
+      required: [true, 'Role field is required'],
     },
     profileImage: {
       type: String,
-      default: "no-image.jpg",
-      maxlength: [255, "You have exceeded the image name length[255]"]
+      default: 'no-image.jpg',
+      maxlength: [255, 'You have exceeded the image name length[255]'],
     },
     resetPasswordToken: String,
     passwordTokenExpire: Date,
     confirmEmailToken: String,
     isEmailConfirmed: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
+    twoFactorCode: String,
+    twoFactorCodeExpire: Date,
   },
   {
     timestamps: true,
@@ -62,17 +65,17 @@ const userSchema = new mongoose.Schema(
       transform: (doc, ret) => {
         ret.id = ret._id;
         delete ret._id;
-      }
+      },
     },
     toObject: {
-      virtuals: true
-    }
-  }
+      virtuals: true,
+    },
+  },
 );
 
 // Password Encryption
-userSchema.pre("save", async function(next) {
-  if (!this.isModified("password")) {
+userSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) {
     next();
   }
   try {
@@ -89,15 +92,15 @@ userSchema.pre("save", async function(next) {
 });
 
 // virtuals for populate
-userSchema.virtual("posts", {
-  ref: "Posts",
-  localField: "_id",
-  foreignField: "user",
-  justOne: false
+userSchema.virtual('posts', {
+  ref: 'Posts',
+  localField: '_id',
+  foreignField: 'user',
+  justOne: false,
 });
 
 // Confirm Password Match
-userSchema.methods.comparePassword = async function(candidatePassword, next) {
+userSchema.methods.comparePassword = async function (candidatePassword, next) {
   try {
     // confirm password
     const isMatch = await bcrypt.compare(candidatePassword, this.password);
@@ -109,36 +112,47 @@ userSchema.methods.comparePassword = async function(candidatePassword, next) {
 };
 
 // Password Reset Token
-userSchema.methods.generatePasswordResetToken = function(next) {
-  const resetToken = crypto.randomBytes(20).toString("hex");
+userSchema.methods.generatePasswordResetToken = function (next) {
+  const resetToken = crypto.randomBytes(20).toString('hex');
 
   this.resetPasswordToken = crypto
-    .createHash("sha256")
+    .createHash('sha256')
     .update(resetToken)
-    .digest("hex");
+    .digest('hex');
 
   this.passwordTokenExpire = Date.now() + 10 * 60 * 1000; // 10 minutes expire
 
   return resetToken;
 };
 
+// 2faCode
+userSchema.methods.generate2faCode = function (next) {
+  const code = randomize('0', 6);
+
+  this.twoFactorCode = code;
+  this.twoFactorCodeExpire = Date.now() + 10 * 60 * 1000;
+
+  return code;
+};
+
 // Generate email confirm token
-userSchema.methods.generateEmailConfirmToken = function(next) {
+userSchema.methods.generateEmailConfirmToken = function (next) {
   // email confirmation token
-  const confirmationToken = crypto.randomBytes(20).toString("hex");
+  const confirmationToken = crypto.randomBytes(20).toString('hex');
 
   this.confirmEmailToken = crypto
-    .createHash("sha256")
+    .createHash('sha256')
     .update(confirmationToken)
-    .digest("hex");
+    .digest('hex');
 
   return confirmationToken;
 };
+
 // Get JSON Web Token
-userSchema.methods.generateJSONWebToken = function(next) {
+userSchema.methods.generateJSONWebToken = function (next) {
   try {
     const token = jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_EXPIRE
+      expiresIn: process.env.JWT_EXPIRE,
     });
 
     return token;
@@ -147,6 +161,6 @@ userSchema.methods.generateJSONWebToken = function(next) {
   }
 };
 
-const User = mongoose.model("Users", userSchema);
+const User = mongoose.model('Users', userSchema);
 
 module.exports = User;

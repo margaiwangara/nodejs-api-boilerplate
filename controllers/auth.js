@@ -1,11 +1,12 @@
-const path = require("path");
-const db = require("../models");
-const ErrorResponse = require("../utils/ErrorResponse");
-const crypto = require("crypto");
-const bcrypt = require("bcryptjs");
+const path = require('path');
+const User = require('../models/users');
+const ErrorResponse = require('../utils/ErrorResponse');
+const crypto = require('crypto');
+const bcrypt = require('bcryptjs');
 
 // send email function
-const sendEmail = require("../utils/sendEmail");
+const sendEmail = require('../utils/sendEmail');
+const { nextTick } = require('process');
 
 /**
  * @desc    Register New User
@@ -17,16 +18,16 @@ exports.registerUser = async (req, res, next) => {
     // get user required field
     const { name, email, password } = req.body;
 
-    if (req.body.role === "admin") {
+    if (req.body.role === 'admin') {
       req.body.role = undefined;
     }
 
     // create new user
-    const user = await db.User.create({
+    const user = await User.create({
       name,
       email,
       password,
-      ...req.body
+      ...req.body,
     });
 
     // grab token and send to email
@@ -37,21 +38,21 @@ exports.registerUser = async (req, res, next) => {
 
     // send email to user with token and stuff
     const URL = `${req.protocol}://${req.get(
-      "host"
+      'host',
     )}/api/auth/confirmemail?token=${confirmEmailToken}`;
     const options = {
       from: `${process.env.NOREPLY_NAME}<${process.env.NOREPLY_EMAIL}>`,
       to: user.email,
-      subject: "Email Confirmation",
+      subject: 'Email Confirmation',
       html: `<p style='text-align: center;display: block;font-family: Helvetica;line-height: 1.5rem;'>Please click on the link below to confirm your email<br/>
-            <a style='text-decoration: none;' href='${URL}'>${URL}</a></p>`
+            <a style='text-decoration: none;' href='${URL}'>${URL}</a></p>`,
     };
 
     // send email
     const sendResult = await sendEmail(options);
 
     if (!sendResult) {
-      console.log("Confirmation email not sent");
+      console.log('Confirmation email not sent');
     }
 
     // get JWT Token
@@ -73,26 +74,102 @@ exports.loginUser = async (req, res, next) => {
 
     if (!email || !password) {
       return next(
-        new ErrorResponse("Email and password fields are required", 400)
+        new ErrorResponse('Email and password fields are required', 400),
       );
     }
 
     // get user by email
-    const user = await db.User.findOne({ email }).select("+password");
+    const user = await User.findOne({ email }).select('+password');
 
     if (user == null) {
-      return next(new ErrorResponse("Invalid credentials", 401));
+      return next(new ErrorResponse('Invalid credentials', 401));
     }
 
     // confirm password input was correct
     const isMatch = await user.comparePassword(password);
 
     if (!isMatch) {
-      return next(new ErrorResponse("Invalid credentials", 401));
+      return next(new ErrorResponse('Invalid credentials', 401));
     }
 
     // JSONWeb Token
     getTokenResponse(user, 200, res);
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @desc Send 2fa Code
+ * @route PUT /api/auth/two-factor
+ * @access Private
+ */
+exports.send2faCode = async (req, res, next) => {
+  try {
+    // get id
+    const user = await User.findById(req.user._id);
+
+    if (!user) return next(new ErrorResponse('Unauthorized access', 401));
+
+    const code = user.generate2faCode();
+    const { email } = user;
+
+    // send email
+    const options = {
+      from: `${process.env.NOREPLY_NAME}<${process.env.NOREPLY_EMAIL}>`,
+      to: email,
+      subject: '2-Factor Authentication Code',
+      html: `<p style='text-align: center;display: block;font-family: Helvetica;line-height: 1.5;'>Please input this code to access your account: ${code}</p>`,
+    };
+
+    // send email
+    const sendResult = await sendEmail(options);
+
+    if (!sendResult) {
+      console.log('2-fa email code not sent');
+    }
+
+    await user.save({ validateBeforeSave: false });
+
+    return res.status(200).json({
+      success: true,
+      code,
+      expiration: user.twoFactorCodeExpire,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @desc Confirm 2fa Code
+ * @route POST /api/auth/two-factor
+ * @access Private
+ */
+exports.confirm2faCode = async (req, res, next) => {
+  // get code
+  const { code } = req.body;
+  try {
+    // get user by token
+    const user = await User.findOne({
+      twoFactorCode: code,
+      twoFactorCodeExpire: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return next(new ErrorResponse('Invalid or expired code', 400));
+    }
+
+    user.twoFactorCode = undefined;
+    user.twoFactorCodeExpire = undefined;
+
+    // save changes
+    user.save({ validateBeforeSave: false });
+
+    // generate JWT Token
+    return res.status(200).json({
+      success: true,
+    });
   } catch (error) {
     next(error);
   }
@@ -107,12 +184,12 @@ exports.logoutUser = async (req, res, next) => {
   try {
     // expire cookie after 10 seconds
     return res
-      .cookie("token", "none", {
+      .cookie('token', 'none', {
         expires: new Date(Date.now() + 10 * 1000), //expire in 10 seconds
-        httpOnly: true
+        httpOnly: true,
       })
       .status(200)
-      .json({ success: true, message: "User logged out successfully" });
+      .json({ success: true, message: 'User logged out successfully' });
   } catch (error) {
     next(error);
   }
@@ -126,11 +203,11 @@ exports.logoutUser = async (req, res, next) => {
 exports.getCurrentlyLoggedInUser = async (req, res, next) => {
   try {
     // get user from req object
-    const user = await db.User.findById(req.user._id);
+    const user = await User.findById(req.user._id);
 
     return res.status(200).json({
       success: true,
-      data: user
+      data: user,
     });
   } catch (error) {
     next(error);
@@ -148,25 +225,25 @@ exports.editLoggedInUserDetails = async (req, res, next) => {
     const updatedFields = {
       name: req.body.name || req.user.name,
       email: req.body.email || req.user.email,
-      surname: req.body.surname || req.user.surname
+      surname: req.body.surname || req.user.surname,
     };
 
     // find user by id
-    const user = await db.User.findById(req.user._id);
+    const user = await User.findById(req.user._id);
 
     if (user == null) {
-      console.log("user not found");
-      return next(new ErrorResponse("User not found", 404));
+      console.log('user not found');
+      return next(new ErrorResponse('User not found', 404));
     }
 
     // update user
-    const updatedUser = await db.User.findByIdAndUpdate(
+    const updatedUser = await User.findByIdAndUpdate(
       req.user._id,
       updatedFields,
       {
         new: true,
-        runValidators: false
-      }
+        runValidators: false,
+      },
     );
 
     return res.status(200).json({ success: true, updatedUser });
@@ -182,25 +259,25 @@ exports.editLoggedInUserDetails = async (req, res, next) => {
  */
 exports.updateLoggedInUserProfileImage = async (req, res, next) => {
   try {
-    const user = await db.User.findById(req.user._id);
+    const user = await User.findById(req.user._id);
 
     // if user exists
     if (!user) {
-      return next(new ErrorResponse("User not found!", 404));
+      return next(new ErrorResponse('User not found!', 404));
     }
 
     // if file exists
     console.log(req.files);
     if (!req.files) {
-      return next(new ErrorResponse("Please upload a file", 400));
+      return next(new ErrorResponse('Please upload a file', 400));
     }
 
     // get file
     const file = req.files.file;
 
     // check if file is an image
-    if (!file.mimetype.startsWith("image")) {
-      return next("Please upload an image file", 400);
+    if (!file.mimetype.startsWith('image')) {
+      return next('Please upload an image file', 400);
     }
 
     // check maximum size
@@ -208,24 +285,24 @@ exports.updateLoggedInUserProfileImage = async (req, res, next) => {
       return next(
         new ErrorResponse(
           `Maximum file size exceeded[${Math.floor(
-            process.env.FILE_MAX_SIZE / 1000000
+            process.env.FILE_MAX_SIZE / 1000000,
           )}MB]`,
-          400
-        )
+          400,
+        ),
       );
     }
 
     // move file
     file.name = `profile_${user._id}${path.parse(file.name).ext}`;
-    file.mv(`${process.env.FILE_UPLOAD_PATH}/${file.name}`, async err => {
+    file.mv(`${process.env.FILE_UPLOAD_PATH}/${file.name}`, async (err) => {
       if (err) {
-        return next(new ErrorResponse("File upload failed", 500));
+        return next(new ErrorResponse('File upload failed', 500));
       }
 
       try {
         // Update db
-        await db.User.findByIdAndUpdate(user._id, {
-          profileImage: file.name
+        await User.findByIdAndUpdate(user._id, {
+          profileImage: file.name,
         });
       } catch (error) {
         return next(error);
@@ -234,7 +311,7 @@ exports.updateLoggedInUserProfileImage = async (req, res, next) => {
 
     return res.status(200).json({
       success: true,
-      message: `File ${file.name} upload was successful`
+      message: `File ${file.name} upload was successful`,
     });
   } catch (error) {
     next(error);
@@ -256,9 +333,9 @@ exports.updatePassword = async (req, res, next) => {
     if (!password || !confirmPassword || !oldPassword) {
       return next(
         new ErrorResponse(
-          "Password, Confirm Password and Old Password fields are required",
-          400
-        )
+          'Password, Confirm Password and Old Password fields are required',
+          400,
+        ),
       );
     }
 
@@ -266,9 +343,9 @@ exports.updatePassword = async (req, res, next) => {
     if (regex.test(password) === false) {
       return next(
         new ErrorResponse(
-          "Please enter a valid password, at least one lowercase and uppercase letter and one number",
-          400
-        )
+          'Please enter a valid password, at least one lowercase and uppercase letter and one number',
+          400,
+        ),
       );
     }
 
@@ -276,23 +353,23 @@ exports.updatePassword = async (req, res, next) => {
     if (password !== confirmPassword) {
       return next(
         new ErrorResponse(
-          "Password and Confirm Password fields must match",
-          400
-        )
+          'Password and Confirm Password fields must match',
+          400,
+        ),
       );
     }
 
     // check if password matches with one in db
-    const user = await db.User.findById(req.user._id).select("+password");
+    const user = await User.findById(req.user._id).select('+password');
     if (!user) {
-      return next(new ErrorResponse("User not found", 404));
+      return next(new ErrorResponse('User not found', 404));
     }
 
     const isMatch = await bcrypt.compare(oldPassword, user.password);
 
     // if match
     if (!isMatch) {
-      return next(new ErrorResponse("Invalid credentials", 401));
+      return next(new ErrorResponse('Invalid credentials', 401));
     }
 
     // change password
@@ -307,6 +384,7 @@ exports.updatePassword = async (req, res, next) => {
     next(error);
   }
 };
+
 /**
  * @desc    Forgot Password
  * @route   POST /api/auth/forgotpassword
@@ -318,15 +396,15 @@ exports.forgotPassword = async (req, res, next) => {
     const { email } = req.body;
 
     if (!email) {
-      return next(new ErrorResponse("Please input your email address", 400));
+      return next(new ErrorResponse('Please input your email address', 400));
     }
 
     // check user with email
-    const user = await db.User.findOne({ email });
+    const user = await User.findOne({ email });
 
     if (!user) {
       return next(
-        new ErrorResponse(`User with email ${email} has not been found`, 404)
+        new ErrorResponse(`User with email ${email} has not been found`, 404),
       );
     }
 
@@ -338,14 +416,14 @@ exports.forgotPassword = async (req, res, next) => {
 
     // send email to user with token and stuff
     const URL = `${req.protocol}://${req.get(
-      "host"
+      'host',
     )}/api/auth/resetpassword?token=${resetToken}`;
     const options = {
       from: `${process.env.NOREPLY_NAME}<${process.env.NOREPLY_EMAIL}>`,
       to: email,
-      subject: "Password Reset Token",
+      subject: 'Password Reset Token',
       html: `<p style='text-align: center;display: block;font-family: Helvetica;line-height: 1.5rem;'>Please click on the link below to reset your password<br/>
-            <a style='text-decoration: none;' href='${URL}'>${URL}</a></p>`
+            <a style='text-decoration: none;' href='${URL}'>${URL}</a></p>`,
     };
 
     // send email
@@ -353,13 +431,13 @@ exports.forgotPassword = async (req, res, next) => {
 
     if (!sendResult) {
       return next(
-        new ErrorResponse("Email not sent. Please try again later", 500)
+        new ErrorResponse('Email not sent. Please try again later', 500),
       );
     }
 
     return res.status(200).json({
       success: true,
-      message: "Please check your email to reset your password"
+      message: 'Please check your email to reset your password',
     });
   } catch (error) {
     console.log(error);
@@ -378,37 +456,37 @@ exports.resetPassword = async (req, res, next) => {
     const { token } = req.query;
 
     if (!token) {
-      return next(new ErrorResponse("Invalid Token", 400));
+      return next(new ErrorResponse('Invalid or expired token', 400));
     }
 
     const resetPasswordToken = crypto
-      .createHash("sha256")
+      .createHash('sha256')
       .update(token)
-      .digest("hex");
+      .digest('hex');
 
     // get user by token
-    const user = await db.User.findOne({
+    const user = await User.findOne({
       resetPasswordToken,
-      passwordTokenExpire: { $gt: Date.now() }
+      passwordTokenExpire: { $gt: Date.now() },
     });
 
     if (!user) {
-      return next(new ErrorResponse("Invalid Token", 400));
+      return next(new ErrorResponse('Invalid or expired token', 400));
     }
 
     // set new password
     const { password } = req.body;
     const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,}$/;
     if (!password) {
-      return next(new ErrorResponse("Password field is required", 400));
+      return next(new ErrorResponse('Password field is required', 400));
     }
 
     if (regex.test(password) === false) {
       return next(
         new ErrorResponse(
-          "Please enter a valid password, at least one lowercase and uppercase letter and one number",
-          400
-        )
+          'Please enter a valid password, at least one lowercase and uppercase letter and one number',
+          400,
+        ),
       );
     }
 
@@ -438,22 +516,22 @@ exports.confirmEmail = async (req, res, next) => {
     const { token } = req.query;
 
     if (!token) {
-      return next(new ErrorResponse("Invalid Token", 400));
+      return next(new ErrorResponse('Invalid Token', 400));
     }
 
     const confirmEmailToken = crypto
-      .createHash("sha256")
+      .createHash('sha256')
       .update(token)
-      .digest("hex");
+      .digest('hex');
 
     // get user by token
-    const user = await db.User.findOne({
+    const user = await User.findOne({
       confirmEmailToken,
-      isEmailConfirmed: false
+      isEmailConfirmed: false,
     });
 
     if (!user) {
-      return next(new ErrorResponse("Invalid Token", 400));
+      return next(new ErrorResponse('Invalid Token', 400));
     }
 
     // update confirmed to true
@@ -479,18 +557,18 @@ const getTokenResponse = (model, statusCode, res) => {
   // cookie options
   const options = {
     expires: new Date(
-      Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000
+      Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000,
     ),
-    httpOnly: true
+    httpOnly: true,
   };
 
   // in production cookie is secure
-  if (process.env.NODE_ENV == "production") {
+  if (process.env.NODE_ENV == 'production') {
     options.secure = true;
   }
 
   return res
     .status(statusCode)
-    .cookie("token", token, options)
+    .cookie('token', token, options)
     .json({ success: true, token });
 };
