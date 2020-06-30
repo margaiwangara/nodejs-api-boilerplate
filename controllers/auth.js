@@ -95,6 +95,7 @@ exports.loginUser = async (req, res, next) => {
     // JSONWeb Token
     getTokenResponse(user, 200, res);
   } catch (error) {
+    console.log(error);
     next(error);
   }
 };
@@ -137,6 +138,7 @@ exports.send2faCode = async (req, res, next) => {
       expiration: user.twoFactorCodeExpire,
     });
   } catch (error) {
+    console.log(error);
     next(error);
   }
 };
