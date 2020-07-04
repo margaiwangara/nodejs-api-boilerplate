@@ -1,21 +1,19 @@
-const nodemailer = require("nodemailer");
-const dotenv = require("dotenv");
+const nodemailer = require('nodemailer');
+const dotenv = require('dotenv');
 
 // dotenv config
 dotenv.config({ path: `${__dirname}/../config/config.env` });
 
 // send email function
-const sendEmail = async options => {
+const sendEmail = async (options) => {
   try {
     // create transporter
     const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: process.env.SMTP_PORT,
-      secure: false,
+      service: 'gmail',
       auth: {
-        user: process.env.SMTP_USERNAME,
-        pass: process.env.SMTP_PASSWORD
-      }
+        user: process.env.GMAIL_EMAIL,
+        pass: process.env.GMAIL_PASSWORD,
+      },
     });
 
     // email information spread

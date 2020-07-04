@@ -42,9 +42,7 @@ exports.registerSchool = async (req, res, next) => {
     user.save({ validateBeforeSave: false });
 
     // send email to user with token and stuff
-    const URL = `${req.protocol}://${req.get(
-      'host',
-    )}/api/auth/confirmemail?token=${confirmEmailToken}`;
+    const URL = `${process.env.CLIENT_URL}/confirmemail?token=${confirmEmailToken}`;
     const options = {
       from: `${process.env.NOREPLY_NAME}<${process.env.NOREPLY_EMAIL}>`,
       to: user.email,

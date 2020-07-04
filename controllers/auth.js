@@ -3,10 +3,10 @@ const User = require('../models/users');
 const ErrorResponse = require('../utils/ErrorResponse');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
+const emailTemplate = require('../utils/emailTemplate');
 
 // send email function
 const sendEmail = require('../utils/sendEmail');
-const { nextTick } = require('process');
 
 /**
  * @desc    Register New User
@@ -37,15 +37,16 @@ exports.registerUser = async (req, res, next) => {
     user.save({ validateBeforeSave: false });
 
     // send email to user with token and stuff
-    const URL = `${req.protocol}://${req.get(
-      'host',
-    )}/api/auth/confirmemail?token=${confirmEmailToken}`;
+    const URL = `${process.env.CLIENT_URL}/confirmemail?token=${confirmEmailToken}`;
     const options = {
       from: `${process.env.NOREPLY_NAME}<${process.env.NOREPLY_EMAIL}>`,
       to: user.email,
       subject: 'Email Confirmation',
-      html: `<p style='text-align: center;display: block;font-family: Helvetica;line-height: 1.5rem;'>Please click on the link below to confirm your email<br/>
-            <a style='text-decoration: none;' href='${URL}'>${URL}</a></p>`,
+      html: emailTemplate({
+        name: user.name,
+        situation: 'email_confirmation',
+        url: URL,
+      }),
     };
 
     // send email
@@ -120,7 +121,11 @@ exports.send2faCode = async (req, res, next) => {
       from: `${process.env.NOREPLY_NAME}<${process.env.NOREPLY_EMAIL}>`,
       to: email,
       subject: '2-Factor Authentication Code',
-      html: `<p style='text-align: center;display: block;font-family: Helvetica;line-height: 1.5;'>Please input this code to access your account: ${code}</p>`,
+      html: emailTemplate({
+        name: user.name,
+        situation: 'two_factor_code',
+        code,
+      }),
     };
 
     // send email
@@ -417,15 +422,16 @@ exports.forgotPassword = async (req, res, next) => {
     await user.save({ validateBeforeSave: false });
 
     // send email to user with token and stuff
-    const URL = `${req.protocol}://${req.get(
-      'host',
-    )}/api/auth/resetpassword?token=${resetToken}`;
+    const URL = `${process.env.CLIENT_URL}/resetpassword?token=${resetToken}`;
     const options = {
       from: `${process.env.NOREPLY_NAME}<${process.env.NOREPLY_EMAIL}>`,
       to: email,
       subject: 'Password Reset Token',
-      html: `<p style='text-align: center;display: block;font-family: Helvetica;line-height: 1.5rem;'>Please click on the link below to reset your password<br/>
-            <a style='text-decoration: none;' href='${URL}'>${URL}</a></p>`,
+      html: emailTemplate({
+        name: user.email,
+        situation: 'password_reset',
+        url: URL,
+      }),
     };
 
     // send email
@@ -461,9 +467,11 @@ exports.resetPassword = async (req, res, next) => {
       return next(new ErrorResponse('Invalid or expired token', 400));
     }
 
+    // split token
+    const splitToken = token.split('.')[0];
     const resetPasswordToken = crypto
       .createHash('sha256')
-      .update(token)
+      .update(splitToken)
       .digest('hex');
 
     // get user by token
@@ -521,6 +529,7 @@ exports.confirmEmail = async (req, res, next) => {
       return next(new ErrorResponse('Invalid Token', 400));
     }
 
+    const splitToken = token.split('.')[0];
     const confirmEmailToken = crypto
       .createHash('sha256')
       .update(token)

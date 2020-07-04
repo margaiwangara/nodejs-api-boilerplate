@@ -122,7 +122,10 @@ userSchema.methods.generatePasswordResetToken = function (next) {
 
   this.passwordTokenExpire = Date.now() + 10 * 60 * 1000; // 10 minutes expire
 
-  return resetToken;
+  const confirmTokenExtend = crypto.randomBytes(100).toString('hex');
+  const confirmTokenCombined = `${resetToken}.${confirmTokenExtend}`;
+
+  return confirmTokenCombined;
 };
 
 // 2faCode
@@ -145,7 +148,9 @@ userSchema.methods.generateEmailConfirmToken = function (next) {
     .update(confirmationToken)
     .digest('hex');
 
-  return confirmationToken;
+  const confirmTokenExtend = crypto.randomBytes(100).toString('hex');
+  const confirmTokenCombined = `${confirmationToken}.${confirmTokenExtend}`;
+  return confirmTokenCombined;
 };
 
 // Get JSON Web Token

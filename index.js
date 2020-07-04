@@ -44,6 +44,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 connectDB();
 
+const User = require('./models/users');
+// User.deleteMany({})
+//   .then(() => console.log('All is well'))
+//   .catch(() => console.log('Something is causing trouble'));
 // api routes
 const fooRoutes = require('./routes/foo');
 const postRoutes = require('./routes/posts');
