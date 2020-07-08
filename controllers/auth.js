@@ -515,7 +515,7 @@ exports.resetPassword = async (req, res, next) => {
  * @route   PUT /api/auth/recoveryemail
  * @access  Private
  */
-exports.setRecoveryEmail = async (req, res, next) => pa {
+exports.setRecoveryEmail = async (req, res, next) => {
   try {
     const { email } = req.body;
 
