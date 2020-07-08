@@ -5,7 +5,7 @@ const emailTemplate = (options) => `<!DOCTYPE html>
     <title>Activate Your RedMonkey Account</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link
-      href="https://fonts.googleapis.com/css?family=Rubik:400,900&display=swap"
+      href="https://fonts.googleapis.com/css?family=Rubik:400,700&display=swap"
       rel="stylesheet"
     />
   </head>
@@ -22,7 +22,7 @@ const emailTemplate = (options) => `<!DOCTYPE html>
               <th
                 style="font-size: 30px;color: #6a2e35;padding: 10px 0;"
               >
-                  <span style="font-weight: 900;">Red</span
+                  <span style="font-weight: 700;">Red</span
                   ><span style="font-weight: 400;">Monkey</span>
               </th>
             </tr>
@@ -105,6 +105,39 @@ const emailTemplate = (options) => `<!DOCTYPE html>
                       >
                     </td>
                   </tr>`
+                    : options.situation == 'school_registration'
+                    ? ` 
+                    <tr>
+                    <td>
+                      <p>
+                        Hello ${options.name},
+                      </p>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <p>Your <a style="text-decoration: none;" href="${process.env.CLIENT_URL}/">RedMonkey</a
+                      > account has been confirmed. Provided below are details to help you access your account.</p>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight: 700;">School Name<2486324/td>
+                    <td>${options.school.name}</td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight: 700;">Username</td>
+                    <td>${options.school.username}</td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight: 700;">E-Mail</td Y2SH3HRXMHM7>
+                    <td>${options.school.email}</td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight: 700;">Password</td>
+                    <td>${options.school.password}</td>
+                  </tr>
+                    
+                    `
                     : ''
                 }
                   <tr>

@@ -56,6 +56,7 @@ const userSchema = new mongoose.Schema(
     },
     twoFactorCode: String,
     twoFactorCodeExpire: Date,
+    recoveryEmail: String,
   },
   {
     timestamps: true,

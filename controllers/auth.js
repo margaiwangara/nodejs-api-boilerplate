@@ -7,6 +7,7 @@ const emailTemplate = require('../utils/emailTemplate');
 
 // send email function
 const sendEmail = require('../utils/sendEmail');
+const { nextTick } = require('process');
 
 /**
  * @desc    Register New User
@@ -409,12 +410,6 @@ exports.forgotPassword = async (req, res, next) => {
     // check user with email
     const user = await User.findOne({ email });
 
-    if (!user) {
-      return next(
-        new ErrorResponse(`User with email ${email} has not been found`, 404),
-      );
-    }
-
     // generate reset token
     const resetToken = user.generatePasswordResetToken();
 
@@ -516,6 +511,37 @@ exports.resetPassword = async (req, res, next) => {
 };
 
 /**
+ * @desc    Recovery Email
+ * @route   PUT /api/auth/recoveryemail
+ * @access  Private
+ */
+exports.setRecoveryEmail = async (req, res, next) => pa {
+  try {
+    const { email } = req.body;
+
+    if (!email)
+      return next(new ErrorResponse('Please input your recover email', 400));
+
+    const user = await User.findById(req.user._id);
+
+    if (!user) return next(new ErrorResponse('Unauthorized Access', 403));
+
+    // update confirm email area
+    const recovery = await User.findByIdAndUpdate(
+      req.user._id,
+      { recoveryEmail: email },
+      { new: true, runValidators: false },
+    );
+
+    return res.status(200).json({
+      success: true,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
  * @desc    Confirm Email
  * @route   GET /api/auth/confirmemail
  * @access  Private
@@ -532,7 +558,7 @@ exports.confirmEmail = async (req, res, next) => {
     const splitToken = token.split('.')[0];
     const confirmEmailToken = crypto
       .createHash('sha256')
-      .update(token)
+      .update(splitToken)
       .digest('hex');
 
     // get user by token

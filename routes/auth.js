@@ -19,6 +19,7 @@ const {
   logoutUser,
   send2faCode,
   confirm2faCode,
+  setRecoveryEmail,
 } = require('../controllers/auth');
 
 // routes
@@ -36,6 +37,8 @@ router.put(
   userAuthorized,
   updateLoggedInUserProfileImage,
 );
+router.put('/recoveryemail', userAuthorized, setRecoveryEmail);
+
 router
   .route('/two-factor')
   .put(userAuthorized, send2faCode)
