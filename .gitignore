@@ -1,2 +1,10 @@
+# log files
+*.log
+
+# node modules
 node_modules/
-yarn-error.log
+
+# config
+config/config.env
+config/secret.env
+.vscode/
