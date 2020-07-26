@@ -40,7 +40,7 @@ exports.registerUser = async (req, res, next) => {
     // send email to user with token and stuff
     const URL = `${process.env.CLIENT_URL}/confirmemail?token=${confirmEmailToken}`;
     const options = {
-      from: `${process.env.NOREPLY_NAME}<${process.env.NOREPLY_EMAIL}>`,
+      from: `${process.env.SMTP_USERNAME}`,
       to: user.email,
       subject: 'Email Confirmation',
       html: emailTemplate({
