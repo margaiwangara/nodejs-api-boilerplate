@@ -20,6 +20,7 @@ const {
   send2faCode,
   confirm2faCode,
   setRecoveryEmail,
+  toggle2faCode,
 } = require('../controllers/auth');
 
 // routes
@@ -43,5 +44,7 @@ router
   .route('/two-factor')
   .put(userAuthorized, send2faCode)
   .post(userAuthorized, confirm2faCode);
+
+router.put('/toggle-two-factor', userAuthorized, toggle2faCode);
 
 module.exports = router;

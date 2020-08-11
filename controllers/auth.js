@@ -103,6 +103,33 @@ exports.loginUser = async (req, res, next) => {
 };
 
 /**
+ * @desc Enable 2fa
+ * @route PUT /api/auth/toggle-two-factor
+ * @access Private
+ */
+exports.toggle2faCode = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    if (!user) return next(new ErrorResponse('Unauthorized access', 401));
+
+    await User.findByIdAndUpdate(
+      req.user._id,
+      { twoFactorEnable: req.body.twoFactor },
+      {
+        runValidators: false,
+      },
+    );
+
+    return res.status(200).json({
+      success: true,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
  * @desc Send 2fa Code
  * @route PUT /api/auth/two-factor
  * @access Private
