@@ -27,16 +27,15 @@ jobs:
 
   deploy:
     needs: [test]
+    name: Deploy app to ftp server
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy app to ftp server
-        steps:
-          - uses: actions/checkout@v2
-            with:
-              fetch-depth: 2
-          - uses: SamKirkland/FTP-Deploy-Action@3.1.1
-            with:
-              ftp-server: ${{ secrets.FTP_SERVER }}
-              ftp-username: ${{ secrets.FTP_USERNAME }}
-              ftp-password: ${{ secrets.FTP_PASSWORD }}
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+      - uses: SamKirkland/FTP-Deploy-Action@3.1.1
+        with:
+          ftp-server: ${{ secrets.FTP_SERVER }}
+          ftp-username: ${{ secrets.FTP_USERNAME }}
+          ftp-password: ${{ secrets.FTP_PASSWORD }}
