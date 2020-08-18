@@ -32,3 +32,19 @@ exports.getCourse = async (req, res, next) => {
     next(error);
   }
 };
+
+/**
+ * @desc    Create Courses
+ * @route   POST /api/courses
+ * @access  Private
+ */
+
+exports.createCourse = async (req, res, next) => {
+  try {
+    const newCourse = await Course.create(req.body);
+
+    return res.status(201).json(newCourse);
+  } catch (error) {
+    next(error);
+  }
+};
