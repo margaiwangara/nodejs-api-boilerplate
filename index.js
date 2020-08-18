@@ -54,11 +54,13 @@ const postRoutes = require('./routes/posts');
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
 const schoolRoutes = require('./routes/schools');
+const courseRoutes = require('./routes/courses');
 app.use('/api/foo', fooRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/auth/users', userRoutes);
 app.use('/api/schools', schoolRoutes);
+app.use('/api/courses', courseRoutes);
 
 // Error Handler
 app.use(function (req, res, next) {

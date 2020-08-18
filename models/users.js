@@ -61,6 +61,12 @@ const userSchema = new mongoose.Schema(
       default: false,
     },
     recoveryEmail: String,
+    courses: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: 'Course',
+      },
+    ],
   },
   {
     timestamps: true,
