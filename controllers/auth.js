@@ -613,6 +613,34 @@ exports.confirmEmail = async (req, res, next) => {
   }
 };
 
+/**
+ * @desc    Add User Courses
+ * @route   PUT /api/auth/account/courses
+ * @access  Private
+ */
+
+exports.saveUserCourses = async (req, res, next) => {
+  try {
+    const { courses } = req.body;
+    const user = await User.findById(req.user._id);
+
+    if (!user) return next(new ErrorResponse('Unauthorized Access', 401));
+
+    // add courses to user
+    user.courses = courses;
+
+    // save
+    user.save({ validateBeforeSave: false });
+
+    return res.status(200).json({
+      success: true,
+      data: user,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // Store JWT in cookie
 const getTokenResponse = (model, statusCode, res) => {
   // token
