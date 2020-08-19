@@ -63,7 +63,7 @@ const userSchema = new mongoose.Schema(
     recoveryEmail: String,
     courses: [
       {
-        type: mongoose.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'Course',
       },
     ],
