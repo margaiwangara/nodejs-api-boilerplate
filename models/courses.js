@@ -15,6 +15,12 @@ const courseSchema = new mongoose.Schema({
     type: Number,
     required: [true, 'Course credit is required'],
   },
+  teachers: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Teacher',
+    },
+  ],
 });
 
 const Course = mongoose.model('Course', courseSchema, 'courses');

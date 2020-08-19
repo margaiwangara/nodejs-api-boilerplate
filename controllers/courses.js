@@ -48,3 +48,27 @@ exports.createCourse = async (req, res, next) => {
     next(error);
   }
 };
+
+/**
+ * @desc    Update Course
+ * @route   PUT /api/courses/:id
+ * @access  Private
+ */
+
+exports.updateCourse = async (req, res, next) => {
+  try {
+    // update users
+    const updatedCourse = await Course.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      {
+        new: true,
+        runValidators: false,
+      },
+    );
+
+    return res.status(200).json(updatedCourse);
+  } catch (error) {
+    next(error);
+  }
+};

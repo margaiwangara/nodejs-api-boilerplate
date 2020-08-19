@@ -238,7 +238,12 @@ exports.logoutUser = async (req, res, next) => {
 exports.getCurrentlyLoggedInUser = async (req, res, next) => {
   try {
     // get user from req object
-    const user = await User.findById(req.user._id).populate('courses');
+    const user = await User.findById(req.user._id).populate({
+      path: 'courses',
+      populate: {
+        path: 'teachers',
+      },
+    });
 
     return res.status(200).json({
       success: true,

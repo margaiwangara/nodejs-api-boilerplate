@@ -7,6 +7,7 @@ const {
   getCourses,
   getCourse,
   createCourse,
+  updateCourse,
 } = require('../controllers/courses');
 
 // middleware
@@ -20,8 +21,11 @@ const Course = require('../models/courses');
 router.use(userAuthorized);
 
 // Routes
-router.route('/').get(advancedResults(Course), getCourses).post(createCourse);
+router
+  .route('/')
+  .get(advancedResults(Course, 'teachers'), getCourses)
+  .post(createCourse);
 
-router.route('/:id').get(getCourse);
+router.route('/:id').get(getCourse).put(updateCourse);
 
 module.exports = router;
