@@ -20,6 +20,10 @@ dotenv.config({ path: './config/config.env' });
 // invoke express
 const app = express();
 
+// prepare server socket io
+const http = require('http').createServer(app);
+const io = require('socket.io')(http);
+
 // invoke middlewares
 app.use(express.json());
 app.use(cookieParser());
@@ -58,6 +62,9 @@ app.use('/api/auth', authRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/auth/users', userRoutes);
 
+// independent routes
+const { getFilteredUsers } = require('./controllers/users');
+app.get('/api/users', getFilteredUsers);
 
 // Error Handler
 app.use(function (req, res, next) {
@@ -70,7 +77,7 @@ app.use(errorHandler);
 
 // set PORT and run app
 const PORT = process.env.PORT || 5000;
-app.listen(
+http.listen(
   PORT,
   console.log(
     `App running in ${process.env.NODE_ENV} mode on port ${PORT}`.green.bold,
