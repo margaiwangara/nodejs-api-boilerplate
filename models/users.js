@@ -61,12 +61,15 @@ const userSchema = new mongoose.Schema(
       default: false,
     },
     recoveryEmail: String,
-    courses: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Course',
+    strategy: {
+      type: {
+        type: String,
+        default: 'local',
+        enum: ['local', 'social'],
+        required: true
       },
-    ],
+      provider: String
+    },
   },
   {
     timestamps: true,

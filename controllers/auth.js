@@ -4,10 +4,13 @@ const ErrorResponse = require('../utils/ErrorResponse');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const emailTemplate = require('../utils/emailTemplate');
+const { OAuth2Client } = require('google-auth-library');
+const generator = require('generate-password');
 
 // send email function
 const sendEmail = require('../utils/sendEmail');
 const { nextTick } = require('process');
+
 
 /**
  * @desc    Register New User
@@ -101,6 +104,54 @@ exports.loginUser = async (req, res, next) => {
     next(error);
   }
 };
+
+/**
+ * @desc    Google Login
+ * @route   POST /api/auth/google
+ * @access  Public
+ */
+ exports.googleLogin = async (req, res, next) => {
+   try {
+     const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+     const { tokenId } = req.body;
+
+     const googleResponse = await client.verifyIdToken({ idToken: tokenId, audience: process.env.GOOGLE_CLIENT_ID });
+     const { email_verified, name, email, picture } = googleResponse.payload;
+
+     if(!email_verified)
+      return next(new ErrorResponse('Invalid credentials', 401));
+
+    // check if user is available
+    let user = await User.findOne({ email });
+
+    if(user == null){
+      // does not exist, initial login, create new user
+      // generate password
+      const password = generator.generate({
+        numbers: true
+      });
+
+      console.log('generated password', password);
+
+      user = await User.create({ name, email, password, profileImage: picture, isEmailConfirmed: true, strategy: { type: 'social', provider: 'google' } });
+    } else {
+      user.isEmailConfirmed = true;
+      user.confirmEmailToken = undefined;
+      if(user.profileImage === 'no-image.jpg' && picture){
+        user.profileImage = picture;
+      }
+
+      user.save({ validateBeforeSave: false });
+    }
+
+    console.log('oauth user', user);
+    // generate jwt token
+    getTokenResponse(user, 200, res);
+   } catch (error) {
+     console.log(error);
+     next(error);
+   }
+ }
 
 /**
  * @desc Enable 2fa
