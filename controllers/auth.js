@@ -131,7 +131,6 @@ exports.loginUser = async (req, res, next) => {
         numbers: true
       });
 
-      console.log('generated password', password);
 
       user = await User.create({ name, email, password, profileImage: picture, isEmailConfirmed: true, strategy: { type: 'social', provider: 'google' } });
     } else {
@@ -144,7 +143,6 @@ exports.loginUser = async (req, res, next) => {
       user.save({ validateBeforeSave: false });
     }
 
-    console.log('oauth user', user);
     // generate jwt token
     getTokenResponse(user, 200, res);
    } catch (error) {
