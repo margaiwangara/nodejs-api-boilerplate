@@ -11,7 +11,6 @@ const generator = require('generate-password');
 const sendEmail = require('../utils/sendEmail');
 const { nextTick } = require('process');
 
-
 /**
  * @desc    Register New User
  * @route   POST /api/auth/register
@@ -110,33 +109,42 @@ exports.loginUser = async (req, res, next) => {
  * @route   POST /api/auth/google
  * @access  Public
  */
- exports.googleLogin = async (req, res, next) => {
-   try {
-     const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-     const { tokenId } = req.body;
+exports.googleLogin = async (req, res, next) => {
+  try {
+    const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+    const { tokenId } = req.body;
 
-     const googleResponse = await client.verifyIdToken({ idToken: tokenId, audience: process.env.GOOGLE_CLIENT_ID });
-     const { email_verified, name, email, picture } = googleResponse.payload;
+    const googleResponse = await client.verifyIdToken({
+      idToken: tokenId,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    const { email_verified, name, email, picture } = googleResponse.payload;
 
-     if(!email_verified)
+    if (!email_verified)
       return next(new ErrorResponse('Invalid credentials', 401));
 
     // check if user is available
     let user = await User.findOne({ email });
 
-    if(user == null){
+    if (user == null) {
       // does not exist, initial login, create new user
       // generate password
       const password = generator.generate({
-        numbers: true
+        numbers: true,
       });
 
-
-      user = await User.create({ name, email, password, profileImage: picture, isEmailConfirmed: true, strategy: { type: 'social', provider: 'google' } });
+      user = await User.create({
+        name,
+        email,
+        password,
+        profileImage: picture,
+        isEmailConfirmed: true,
+        strategy: { type: 'social', provider: 'google' },
+      });
     } else {
       user.isEmailConfirmed = true;
       user.confirmEmailToken = undefined;
-      if(user.profileImage === 'no-image.jpg' && picture){
+      if (user.profileImage === 'no-image.jpg' && picture) {
         user.profileImage = picture;
       }
 
@@ -145,11 +153,11 @@ exports.loginUser = async (req, res, next) => {
 
     // generate jwt token
     getTokenResponse(user, 200, res);
-   } catch (error) {
-     console.log(error);
-     next(error);
-   }
- }
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
 
 /**
  * @desc Enable 2fa
@@ -315,6 +323,7 @@ exports.editLoggedInUserDetails = async (req, res, next) => {
       name: req.body.name || req.user.name,
       email: req.body.email || req.user.email,
       surname: req.body.surname || req.user.surname,
+      twoFactorEnable: req.body.two_factor,
     };
 
     // find user by id
