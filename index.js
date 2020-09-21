@@ -17,6 +17,11 @@ const cors = require('cors');
 // load env vars
 dotenv.config({ path: './config/config.env' });
 
+// set client url
+process.env.CLIENT_URL =
+  process.env.NODE_ENV === 'development'
+    ? 'http://localhost:3000'
+    : process.env.CLIENT_URL;
 // invoke express
 const app = express();
 

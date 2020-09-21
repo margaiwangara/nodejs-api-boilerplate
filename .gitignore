@@ -8,3 +8,6 @@ node_modules/
 config/config.env
 config/secret.env
 .vscode/
+
+# public images
+/public/uploads/**
