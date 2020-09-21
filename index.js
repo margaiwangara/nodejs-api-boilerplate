@@ -28,6 +28,21 @@ const app = express();
 // prepare server socket io
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
+const axios = require('axios');
+
+// socket functions
+const { getMessages } = require('./socket.io/messages');
+io.on('connection', (socket) => {
+  socket.on('joined', (data, callback) => {
+    console.log('Client Joined');
+    const { name, id } = data.user;
+    // broadcast join
+    socket.broadcast.emit('joined', { name, id });
+
+    socket.emit('get_messages', ['Day 1', 'Day 2', 'Day 3']);
+  });
+  socket.on('disconnect', () => console.log('Client disconnected'));
+});
 
 // invoke middlewares
 app.use(express.json());
@@ -53,18 +68,15 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 connectDB();
 
-const User = require('./models/users');
-// User.deleteMany({})
-//   .then(() => console.log('All is well'))
-//   .catch(() => console.log('Something is causing trouble'));
-// api routes
 const fooRoutes = require('./routes/foo');
 const postRoutes = require('./routes/posts');
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
+const messageRoutes = require('./routes/messages');
 app.use('/api/foo', fooRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/posts', postRoutes);
+app.use('/api/messages', messageRoutes);
 app.use('/api/auth/users', userRoutes);
 
 // independent routes
