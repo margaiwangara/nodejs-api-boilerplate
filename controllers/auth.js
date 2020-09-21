@@ -6,6 +6,7 @@ const bcrypt = require('bcryptjs');
 const emailTemplate = require('../utils/emailTemplate');
 const { OAuth2Client } = require('google-auth-library');
 const generator = require('generate-password');
+const axios = require('axios');
 
 // send email function
 const sendEmail = require('../utils/sendEmail');
@@ -154,7 +155,66 @@ exports.googleLogin = async (req, res, next) => {
     // generate jwt token
     getTokenResponse(user, 200, res);
   } catch (error) {
-    console.log(error);
+    next(error);
+  }
+};
+
+/**
+ * @desc    Facebook Login
+ * @route   POST /api/auth/facebook
+ * @access  Public
+ */
+exports.facebookLogin = async (req, res, next) => {
+  const { accessToken, userId } = req.body;
+  const graphURL = `${process.env.FACEBOOK_GRAPH_URL}/v2.11/${userId}/`;
+  try {
+    const response = await axios.get(graphURL, {
+      params: {
+        fields: 'id, name, email, picture',
+        access_token: accessToken,
+      },
+    });
+
+    const { name, email, id, picture } = response.data;
+
+    // check if user exists
+    let user = await User.findOne({ email });
+
+    if (user == null) {
+      // generate password
+      const password = generator.generate({
+        numbers: true,
+      });
+
+      user = await User.create({
+        name,
+        email,
+        password,
+        profileImage: picture.data.url,
+        isEmailConfirmed: true,
+        strategy: { type: 'social', provider: 'facebook' },
+      });
+    } else {
+      user.isEmailConfirmed = true;
+      user.confirmEmailToken = undefined; // google,instagram,twitter ...split [google,inst,twitter,facebook].join(',')
+      const provider =
+        user.strategy.type === 'social'
+          ? [...user.strategy.provider.split(','), 'facebook'].join(',')
+          : undefined;
+      user.strategy = {
+        provider,
+      };
+
+      if (user.profileImage === 'no-image.jpg' && picture) {
+        user.profileImage = picture;
+      }
+
+      user.save({ validateBeforeSave: false });
+    }
+
+    // generate jwt token
+    getTokenResponse(user, 200, res);
+  } catch (error) {
     next(error);
   }
 };

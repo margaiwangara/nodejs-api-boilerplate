@@ -22,7 +22,8 @@ const {
   setRecoveryEmail,
   toggle2faCode,
   saveUserCourses,
-  googleLogin
+  googleLogin,
+  facebookLogin,
 } = require('../controllers/auth');
 
 // routes
@@ -30,6 +31,7 @@ router.post('/register', registerUser);
 router.post('/login', loginUser);
 router.get('/logout', logoutUser);
 router.post('/google', googleLogin);
+router.post('/facebook', facebookLogin);
 router.post('/forgotpassword', forgotPassword);
 router.post('/resetpassword', resetPassword);
 router.get('/confirmemail', confirmEmail);
