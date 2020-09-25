@@ -30,25 +30,6 @@ const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 const axios = require('axios');
 
-// socket functions
-const { getMessages } = require('./socket.io/messages');
-io.on('connection', (socket) => {
-  socket.on('joined', (data, callback) => {
-    console.log('Client Joined');
-    const { name, id } = data;
-    // broadcast join
-    socket.broadcast.emit('joined', { name, id });
-
-    socket.emit('get_messages', ['Day 1', 'Day 2', 'Day 3']);
-  });
-
-  socket.on('disconnect', (data) => {
-    console.log('disconnect', data);
-    // const { name, id } = data;
-    // socket.broadcast.emit('disconnect', { name, id });
-  });
-});
-
 // invoke middlewares
 app.use(express.json());
 app.use(cookieParser());
@@ -77,16 +58,10 @@ const fooRoutes = require('./routes/foo');
 const postRoutes = require('./routes/posts');
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
-const messageRoutes = require('./routes/messages');
 app.use('/api/foo', fooRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/posts', postRoutes);
-app.use('/api/messages', messageRoutes);
 app.use('/api/auth/users', userRoutes);
-
-// independent routes
-const { getFilteredUsers } = require('./controllers/users');
-app.get('/api/users', getFilteredUsers);
 
 // Error Handler
 app.use(function (req, res, next) {
