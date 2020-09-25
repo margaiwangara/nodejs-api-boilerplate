@@ -1,33 +1,25 @@
-const db = require("../models");
-const ErrorResponse = require("../utils/ErrorResponse");
+const db = require('../models');
+const { ErrorResponse, asyncWrapper } = require('../utils');
 
 /**
  * @desc    GET all data
  * @route   /api/foo
  */
-exports.getFoos = async (req, res, next) => {
-  try {
-    return res.status(200).json(res.advancedResults);
-  } catch (error) {
-    next(error);
-  }
-};
+exports.getFoos = asyncWrapper(async (req, res, next) => {
+  return res.status(200).json(res.advancedResults);
+});
 
 /**
  * @desc    GET single data
  * @route   /api/foo/:id
  */
-exports.getFoo = async (req, res, next) => {
-  try {
-    const foo = await db.Foo.findById(req.params.id);
-    if (!foo) {
-      return next(new ErrorResponse(`Resource Not Found`, 404));
-    }
-    return res.status(200).json(foo);
-  } catch (error) {
-    next(error);
+exports.getFoo = asyncWrapper(async (req, res, next) => {
+  const foo = await db.Foo.findById(req.params.id);
+  if (!foo) {
+    return next(new ErrorResponse(`Resource Not Found`, 404));
   }
-};
+  return res.status(200).json(foo);
+});
 
 /**
  * @desc    CREATE and add documents to collection
@@ -46,34 +38,26 @@ exports.createFoo = async (req, res, next) => {
  * @desc    UPDATE document in collection
  * @route   /api/foo/:id
  */
-exports.updateFoo = async (req, res, next) => {
-  try {
-    const updatedFoo = await db.Foo.findOneAndUpdate(
-      { _id: req.params.id },
-      req.body,
-      {
-        new: true,
-        runValidators: true
-      }
-    );
+exports.updateFoo = asyncWrapper(async (req, res, next) => {
+  const updatedFoo = await db.Foo.findOneAndUpdate(
+    { _id: req.params.id },
+    req.body,
+    {
+      new: true,
+      runValidators: true,
+    },
+  );
 
-    return res.status(200).json(updatedFoo);
-  } catch (error) {
-    next(error);
-  }
-};
+  return res.status(200).json(updatedFoo);
+});
 
 /**
  * @desc    DELETE document from collection
  * @route   /api/foo/:id
  */
-exports.deleteFoo = async (req, res, next) => {
-  try {
-    await db.Foo.findByIdAndDelete(req.params.id);
-    return res.status(200).json({
-      success: true
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+exports.deleteFoo = asyncWrapper(async (req, res, next) => {
+  await db.Foo.findByIdAndDelete(req.params.id);
+  return res.status(200).json({
+    success: true,
+  });
+});

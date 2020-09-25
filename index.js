@@ -35,13 +35,18 @@ const { getMessages } = require('./socket.io/messages');
 io.on('connection', (socket) => {
   socket.on('joined', (data, callback) => {
     console.log('Client Joined');
-    const { name, id } = data.user;
+    const { name, id } = data;
     // broadcast join
     socket.broadcast.emit('joined', { name, id });
 
     socket.emit('get_messages', ['Day 1', 'Day 2', 'Day 3']);
   });
-  socket.on('disconnect', () => console.log('Client disconnected'));
+
+  socket.on('disconnect', (data) => {
+    console.log('disconnect', data);
+    // const { name, id } = data;
+    // socket.broadcast.emit('disconnect', { name, id });
+  });
 });
 
 // invoke middlewares
