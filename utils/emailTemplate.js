@@ -1,8 +1,10 @@
-const emailTemplate = (options) => `<!DOCTYPE html>
+const emailTemplate = (ops) => {
+  let options = { ...ops, app: process.env.APP_NAME };
+  return `<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Activate Your RedMonkey Account</title>
+    <title>Activate Your ${options.app} Account</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link
       href="https://fonts.googleapis.com/css?family=Rubik:400,700&display=swap"
@@ -22,8 +24,8 @@ const emailTemplate = (options) => `<!DOCTYPE html>
               <th
                 style="font-size: 30px;color: #6a2e35;padding: 10px 0;"
               >
-                  <span style="font-weight: 700;">Red</span
-                  ><span style="font-weight: 400;">Monkey</span>
+                  <span style="font-weight: 700;">${options.app}</span
+                  >
               </th>
             </tr>
             <tr>
@@ -45,7 +47,7 @@ const emailTemplate = (options) => `<!DOCTYPE html>
                     <td>
                       <p>
                         Welcome to
-                        <a style="text-decoration: none;" href="${process.env.CLIENT_URL}/">RedMonkey</a
+                        <a style="text-decoration: none;" href="${process.env.CLIENT_URL}/">${options.app}</a
                         >, an online education platform.
                       </p>
                     </td>
@@ -91,7 +93,7 @@ const emailTemplate = (options) => `<!DOCTYPE html>
                   </tr>
                   <tr>
                     <td>
-                      Your <a style="text-decoration: none;" href="${process.env.CLIENT_URL}/">RedMonkey</a
+                      Your <a style="text-decoration: none;" href="${process.env.CLIENT_URL}/">${options.app}</a
                       > password can be reset by clicking <a href="${options.url}" style="text-decoration: none;">here</a> or the
                       button provided below:
                     </td>
@@ -116,7 +118,7 @@ const emailTemplate = (options) => `<!DOCTYPE html>
                   </tr>
                   <tr>
                     <td>
-                      <p>Your <a style="text-decoration: none;" href="${process.env.CLIENT_URL}/">RedMonkey</a
+                      <p>Your <a style="text-decoration: none;" href="${process.env.CLIENT_URL}/">${options.app}</a
                       > account has been confirmed. Provided below are details to help you access your account.</p>
                     </td>
                   </tr>
@@ -150,7 +152,7 @@ const emailTemplate = (options) => `<!DOCTYPE html>
                   <tr>
                     <td>
                       <small style="color: grey;"
-                        >&copy; 2020 RedMonkey. All Rights Reserved.</small
+                        >&copy; 2020 ${options.app}. All Rights Reserved.</small
                       >
                     </td>
                   </tr>
@@ -163,5 +165,6 @@ const emailTemplate = (options) => `<!DOCTYPE html>
     </table>
   </body>
 </html>`;
+};
 
 module.exports = emailTemplate;

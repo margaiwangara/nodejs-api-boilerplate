@@ -9,15 +9,21 @@ const sendEmail = async (options) => {
   try {
     // create transporter
     const transporter = nodemailer.createTransport({
-      service: 'gmail',
+      host: process.env.SMTP_HOST,
+      port: process.env.SMTP_PORT,
+      secure: true,
       auth: {
-        user: process.env.GMAIL_EMAIL,
-        pass: process.env.GMAIL_PASSWORD,
+        user: process.env.SMTP_USERNAME,
+        pass: process.env.SMTP_PASSWORD,
+      },
+      tls: {
+        // do not fail on invalid certs
+        rejectUnauthorized: false,
       },
     });
 
     // email information spread
-    console.log(options);
+    // console.log(options);
     const info = await transporter.sendMail(options);
 
     console.log(`Message sent. Id: ${info.messageId}`);

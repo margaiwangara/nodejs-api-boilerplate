@@ -56,7 +56,20 @@ const userSchema = new mongoose.Schema(
     },
     twoFactorCode: String,
     twoFactorCodeExpire: Date,
+    twoFactorEnable: {
+      type: Boolean,
+      default: false,
+    },
     recoveryEmail: String,
+    strategy: {
+      type: {
+        type: String,
+        default: 'local',
+        enum: ['local', 'social'],
+        required: true
+      },
+      provider: String
+    },
   },
   {
     timestamps: true,
