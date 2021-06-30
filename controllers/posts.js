@@ -1,4 +1,5 @@
-const db = require('../models');
+const Post = require('../models/posts');
+const User = require('../models/users');
 const { ErrorResponse, asyncWrapper } = require('../utils');
 
 /**
@@ -12,11 +13,11 @@ exports.getPosts = asyncWrapper(async (req, res, next) => {
   // check if user_id exists
   if (req.params.id) {
     // get data belonging to user
-    posts = await db.Post.find({ user: req.params.id });
+    posts = await Post.find({ user: req.params.id });
   }
 
   // else get all posts
-  posts = await db.Post.find();
+  posts = await Post.find();
 
   return res.status(200).json(res.advancedResults);
 });
@@ -35,7 +36,7 @@ exports.getPost = asyncWrapper(async (req, res, next) => {
   }
 
   // get post
-  const post = await db.Post.findById(id).populate('user');
+  const post = await Post.findById(id).populate('user');
 
   // check if post exists
   if (!post) {
@@ -61,7 +62,7 @@ exports.createPost = asyncWrapper(async (req, res, next) => {
   }
 
   // create new post
-  const newPost = await db.Post.create({ ...req.body, user: user._id });
+  const newPost = await Post.create({ ...req.body, user: user._id });
 
   return res.status(201).json(newPost);
 });
@@ -83,7 +84,7 @@ exports.updatePost = asyncWrapper(async (req, res, next) => {
   const user = await db.User.findById(req.user._id);
 
   // find post
-  const post = await db.Post.findById(id);
+  const post = await Post.findById(id);
 
   // 404 Post not found
   if (!post) {
@@ -105,7 +106,7 @@ exports.updatePost = asyncWrapper(async (req, res, next) => {
   }
 
   // update post
-  const updatePost = await db.Post.findByIdAndUpdate(id, req.body, {
+  const updatePost = await Post.findByIdAndUpdate(id, req.body, {
     new: true,
     runValidators: false,
   });
@@ -127,10 +128,10 @@ exports.deletePost = asyncWrapper(async (req, res, next) => {
   }
 
   // check if user has ownership of post
-  const user = await db.User.findById(req.user._id);
+  const user = await User.findById(req.user._id);
 
   // find post
-  const post = await db.Post.findById(id);
+  const post = await Post.findById(id);
 
   // 404 Post not found
   if (!post) {
