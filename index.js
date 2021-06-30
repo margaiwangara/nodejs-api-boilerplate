@@ -17,37 +17,12 @@ const cors = require('cors');
 // load env vars
 dotenv.config({ path: './config/config.env' });
 
-// set client url
-process.env.CLIENT_URL =
-  process.env.NODE_ENV === 'development'
-    ? 'http://localhost:3000'
-    : process.env.CLIENT_URL;
 // invoke express
 const app = express();
 
 // prepare server socket io
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
-const axios = require('axios');
-
-// socket functions
-const { getMessages } = require('./socket.io/messages');
-io.on('connection', (socket) => {
-  socket.on('joined', (data, callback) => {
-    console.log('Client Joined');
-    const { name, id } = data;
-    // broadcast join
-    socket.broadcast.emit('joined', { name, id });
-
-    socket.emit('get_messages', ['Day 1', 'Day 2', 'Day 3']);
-  });
-
-  socket.on('disconnect', (data) => {
-    console.log('disconnect', data);
-    // const { name, id } = data;
-    // socket.broadcast.emit('disconnect', { name, id });
-  });
-});
 
 // invoke middlewares
 app.use(express.json());
@@ -66,7 +41,12 @@ app.use(helmet()); //helmet to add headers and prevent security flaws
 app.use(xssClean()); //prevent xss attacks eg <script></script> tags in db
 app.use(limiter); //no of request rate limited
 app.use(hpp()); //prevent http param polution
-app.use(cors()); //enabled cors for all routes
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL,
+    credentials: true,
+  }),
+); //enabled cors for all routes
 
 // static files in public folder
 app.use(express.static(path.join(__dirname, 'public')));
