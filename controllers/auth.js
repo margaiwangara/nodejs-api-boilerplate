@@ -305,11 +305,10 @@ exports.confirm2faCode = asyncWrapper(async (req, res, next) => {
  */
 exports.logoutUser = asyncWrapper(async (req, res, next) => {
   // expire cookie after 10 seconds
+
+  // clear cookie
+  res.clearCookie('token');
   return res
-    .cookie('token', 'none', {
-      expires: new Date(Date.now() + 10 * 1000), //expire in 10 seconds
-      httpOnly: true,
-    })
     .status(200)
     .json({ success: true, message: 'User logged out successfully' });
 });
@@ -410,7 +409,7 @@ exports.updateLoggedInUserProfileImage = asyncWrapper(
     }
 
     // move file
-    file.name = `profile_${user._id}${path.parse(file.name).ext}`;
+    file.name = `profile_${file.name}-${user._id}${path.parse(file.name).ext}`;
     file.mv(`${process.env.FILE_UPLOAD_PATH}/${file.name}`, async (err) => {
       if (err) {
         return next(new ErrorResponse('File upload failed', 500));
@@ -508,6 +507,10 @@ exports.forgotPassword = asyncWrapper(async (req, res, next) => {
 
   // check user with email
   const user = await User.findOne({ email });
+
+  if (!user) {
+    return next(new ErrorResponse(`User does not exist`, 404));
+  }
 
   // generate reset token
   const resetToken = user.generatePasswordResetToken();
@@ -679,15 +682,12 @@ const getTokenResponse = (model, statusCode, res) => {
       Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000,
     ),
     httpOnly: true,
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    secure: process.env.NODE_ENV === 'production',
   };
 
-  // in production cookie is secure
-  if (process.env.NODE_ENV == 'production') {
-    options.secure = true;
-  }
-
   return res
-    .status(statusCode)
     .cookie('token', token, options)
+    .status(statusCode)
     .json({ success: true, token });
 };
