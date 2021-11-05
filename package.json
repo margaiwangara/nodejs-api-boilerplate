@@ -1,16 +1,16 @@
 {
-  "name": "redmonkey-server",
+  "name": "mtandao-server",
   "version": "1.0.0",
-  "description": "An educational platform project",
+  "description": "A social media application",
   "main": "index.js",
   "scripts": {
-    "start": "SET NODE_ENV=production & node index",
+    "start": "node index.js",
     "dev": "nodemon index",
     "test": "mocha --timeout 10000 --exit"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/red-monkey/redmonkey-server.git"
+    "url": "git+https://github.com/margaiwangara/nodejs-api-boilerplate.git"
   },
   "keywords": [
     "redmonkey",
@@ -20,9 +20,9 @@
   "author": "Margai Wangara",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/red-monkey/redmonkey-server/issues"
+    "url": "git+https://github.com/margaiwangara/nodejs-api-boilerplate/issues"
   },
-  "homepage": "https://github.com/red-monkey/redmonkey-server#readme",
+  "homepage": "git+https://github.com/margaiwangara/nodejs-api-boilerplate#readme",
   "devDependencies": {
     "chai": "^4.2.0",
     "chai-http": "^4.3.0",
