@@ -1,5 +1,7 @@
 const emailTemplate = (ops) => {
   let options = { ...ops, app: process.env.APP_NAME };
+  let date = new Date().getFullYear();
+
   return `<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -48,7 +50,7 @@ const emailTemplate = (ops) => {
                       <p>
                         Welcome to
                         <a style="text-decoration: none;" href="${process.env.CLIENT_URL}/">${options.app}</a
-                        >, an online education platform.
+                        >, a social media application.
                       </p>
                     </td>
                   </tr>
@@ -63,7 +65,7 @@ const emailTemplate = (ops) => {
                     <td style="padding: 35px 0;text-align: center;">
                       <a
                         href="${options.url}"
-                        style="padding: 20px;text-decoration: none;background: #6a2e35;color: #e3d081;letter-spacing: 0.5px;font-weight: 400;text-align: center;"
+                        style="padding: 20px;text-decoration: none;background: #6a2e35;color: #e3d081;letter-spacing: 0.5px;font-weight: 700;text-align: center;"
                         >Activate Account</a
                       >
                     </td>
@@ -102,7 +104,7 @@ const emailTemplate = (ops) => {
                     <td style="padding: 35px 0;text-align: center;">
                       <a
                         href="${options.url}"
-                        style="padding: 20px;text-decoration: none;background: #6a2e35;color: #e3d081;letter-spacing: 0.5px;font-weight: 400;text-align: center;"
+                        style="padding: 20px;text-decoration: none;background: #6a2e35;color: #e3d081;letter-spacing: 0.5px;font-weight: 700;text-align: center;"
                         >Reset Password</a
                       >
                     </td>
@@ -152,7 +154,9 @@ const emailTemplate = (ops) => {
                   <tr>
                     <td>
                       <small style="color: grey;"
-                        >&copy; 2020 ${options.app}. All Rights Reserved.</small
+                        >&copy; ${date} ${
+    options.app
+  }. All Rights Reserved.</small
                       >
                     </td>
                   </tr>

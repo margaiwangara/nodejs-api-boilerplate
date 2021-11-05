@@ -40,7 +40,7 @@ exports.registerUser = asyncWrapper(async (req, res, next) => {
   user.save({ validateBeforeSave: false });
 
   // send email to user with token and stuff
-  const URL = `${process.env.CLIENT_URL}/confirmemail?token=${confirmEmailToken}`;
+  const URL = `${process.env.CLIENT_URL}/confirm-email?token=${confirmEmailToken}`;
   const options = {
     from: `${process.env.NOREPLY_EMAIL}`,
     to: user.email,
@@ -519,7 +519,7 @@ exports.forgotPassword = asyncWrapper(async (req, res, next) => {
   await user.save({ validateBeforeSave: false });
 
   // send email to user with token and stuff
-  const URL = `${process.env.CLIENT_URL}/resetpassword?token=${resetToken}`;
+  const URL = `${process.env.CLIENT_URL}/reset-password?token=${resetToken}`;
   const options = {
     from: `${process.env.NOREPLY_EMAIL}`,
     to: email,
@@ -560,15 +560,15 @@ exports.resetPassword = asyncWrapper(async (req, res, next) => {
   }
 
   // split token
-  const splitToken = token.split('.')[0];
-  const resetPasswordToken = crypto
-    .createHash('sha256')
-    .update(splitToken)
-    .digest('hex');
+  // const splitToken = token.split('.')[0];
+  // const resetPasswordToken = crypto
+  //   .createHash('sha256')
+  //   .update(splitToken)
+  //   .digest('hex');
 
   // get user by token
   const user = await User.findOne({
-    resetPasswordToken,
+    resetPasswordToken: token,
     passwordTokenExpire: { $gt: Date.now() },
   });
 
@@ -643,15 +643,15 @@ exports.confirmEmail = asyncWrapper(async (req, res, next) => {
     return next(new ErrorResponse('Invalid Token', 400));
   }
 
-  const splitToken = token.split('.')[0];
-  const confirmEmailToken = crypto
-    .createHash('sha256')
-    .update(splitToken)
-    .digest('hex');
+  // const splitToken = token.split('.')[0];
+  // const confirmEmailToken = crypto
+  //   .createHash('sha256')
+  //   .update(splitToken)
+  //   .digest('hex');
 
   // get user by token
   const user = await User.findOne({
-    confirmEmailToken,
+    confirmEmailToken: token,
     isEmailConfirmed: false,
   });
 

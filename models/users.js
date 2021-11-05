@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const randomize = require('randomatic');
+const { v4: uuidv4 } = require('uuid');
 
 // schema
 const userSchema = new mongoose.Schema(
@@ -66,9 +67,9 @@ const userSchema = new mongoose.Schema(
         type: String,
         default: 'local',
         enum: ['local', 'social'],
-        required: true
+        required: true,
       },
-      provider: String
+      provider: String,
     },
   },
   {
@@ -127,19 +128,22 @@ userSchema.methods.comparePassword = async function (candidatePassword, next) {
 
 // Password Reset Token
 userSchema.methods.generatePasswordResetToken = function (next) {
-  const resetToken = crypto.randomBytes(20).toString('hex');
+  // const resetToken = crypto.randomBytes(20).toString('hex');
 
-  this.resetPasswordToken = crypto
-    .createHash('sha256')
-    .update(resetToken)
-    .digest('hex');
+  // this.resetPasswordToken = crypto
+  //   .createHash('sha256')
+  //   .update(resetToken)
+  //   .digest('hex');
+
+  const resetToken = uuidv4();
+  this.resetPasswordToken = resetToken;
 
   this.passwordTokenExpire = Date.now() + 10 * 60 * 1000; // 10 minutes expire
 
   const confirmTokenExtend = crypto.randomBytes(100).toString('hex');
   const confirmTokenCombined = `${resetToken}.${confirmTokenExtend}`;
 
-  return confirmTokenCombined;
+  return resetToken;
 };
 
 // 2faCode
@@ -155,16 +159,19 @@ userSchema.methods.generate2faCode = function (next) {
 // Generate email confirm token
 userSchema.methods.generateEmailConfirmToken = function (next) {
   // email confirmation token
-  const confirmationToken = crypto.randomBytes(20).toString('hex');
+  // const confirmationToken = crypto.randomBytes(20).toString('hex');
 
-  this.confirmEmailToken = crypto
-    .createHash('sha256')
-    .update(confirmationToken)
-    .digest('hex');
+  // this.confirmEmailToken = crypto
+  //   .createHash('sha256')
+  //   .update(confirmationToken)
+  //   .digest('hex');
+
+  const confirmationToken = uuidv4();
+  this.confirmEmailToken = confirmationToken;
 
   const confirmTokenExtend = crypto.randomBytes(100).toString('hex');
   const confirmTokenCombined = `${confirmationToken}.${confirmTokenExtend}`;
-  return confirmTokenCombined;
+  return confirmationToken;
 };
 
 // Get JSON Web Token
