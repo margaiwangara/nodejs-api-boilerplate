@@ -42,7 +42,7 @@ exports.registerUser = asyncWrapper(async (req, res, next) => {
   // send email to user with token and stuff
   const URL = `${process.env.CLIENT_URL}/confirm-email?token=${confirmEmailToken}`;
   const options = {
-    from: `${process.env.NOREPLY_EMAIL}`,
+    from: `Mtandao <${process.env.SENDGRID_NOREPLY_EMAIL}>`,
     to: user.email,
     subject: 'Email Confirmation',
     html: emailTemplate({
@@ -241,7 +241,7 @@ exports.send2faCode = asyncWrapper(async (req, res, next) => {
 
   // send email
   const options = {
-    from: `${process.env.NOREPLY_EMAIL}`,
+    from: `Mtandao <${process.env.SENDGRID_NOREPLY_EMAIL}>`,
     to: email,
     subject: '2-Factor Authentication Code',
     html: emailTemplate({
@@ -521,7 +521,7 @@ exports.forgotPassword = asyncWrapper(async (req, res, next) => {
   // send email to user with token and stuff
   const URL = `${process.env.CLIENT_URL}/reset-password?token=${resetToken}`;
   const options = {
-    from: `${process.env.NOREPLY_EMAIL}`,
+    from: from: `Mtandao <${process.env.SENDGRID_NOREPLY_EMAIL}>`,
     to: email,
     subject: 'Password Reset Token',
     html: emailTemplate({
