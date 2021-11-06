@@ -521,7 +521,7 @@ exports.forgotPassword = asyncWrapper(async (req, res, next) => {
   // send email to user with token and stuff
   const URL = `${process.env.CLIENT_URL}/reset-password?token=${resetToken}`;
   const options = {
-    from: from: `Mtandao <${process.env.SENDGRID_NOREPLY_EMAIL}>`,
+    from: `Mtandao <${process.env.SENDGRID_NOREPLY_EMAIL}>`,
     to: email,
     subject: 'Password Reset Token',
     html: emailTemplate({
